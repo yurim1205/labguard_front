@@ -13,7 +13,7 @@ function Header() {
     <div className="max-w-screen-xl mx-auto flex items-center justify-between px-8 h-full">
       
     <div className="flex-1">
-      <Link to="/dashboard" className="no-underline">
+      <Link to="/dashboard">
         <h1 className="cursor-pointer font-sans text-[#33308B] text-[24px] font-extrabold tracking-widest ml-[60px] whitespace-nowrap">
           LAB GUARD
         </h1>
