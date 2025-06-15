@@ -1,10 +1,7 @@
 import { useRef, useState } from 'react';
-import Header from '../components/Header';
-import NewExperimentModal from '../components/modal/NewExperimentModal'; 
-import NewExperiment from '../components/NewExperiment';
-import ExperimentContinue from '../components/ExperimentContinue';
+import Header from '../../components/Header';
 
-function ExperimentMain() {
+function ReportMain() {
   const fileInputRef = useRef();
   const [selectedFile, setSelectedFile] = useState(null);
   const [activeTab, setActiveTab] = useState('ongoing'); 
@@ -36,10 +33,16 @@ function ExperimentMain() {
   return (
     <>
       <Header />
-      {isModalOpen && <NewExperimentModal onClose={() => setIsModalOpen(false)} />}
+      
+      {/* 모달 */}
+      {isModalOpen && (
+        <NewExperimentModal onClose={() => setIsModalOpen(false)} manuals={manuals} />
+      )}
+
       <div className="max-w-[1200px] mx-auto pt-10 pb-12">
-        <h1 className="text-[2.3rem] font-black mb-[30px] text-left tracking-tight">실험</h1>
-        <h2 className="text-[20px] font-bold text-left font-[500] mb-0">실험 진행</h2>
+        {/* 주요 콘텐츠 */}
+        <h1 className="text-[2.3rem] font-black mb-[30px] text-left tracking-tight">리포트</h1>
+        <h2 className="text-[20px] font-bold text-left font-[500] mb-0">내 리포트</h2>
         <p className="text-[#7B87B8] text-base text-left mt-[-10px]">
           새 실험을 생성하거나 이전 실험을 이어 진행할 수 있습니다. <br />
           등록된 매뉴얼에 따라 AI가 실험 중 주의사항을 안내해주고 음성 Q&A도 지원합니다.
@@ -51,7 +54,7 @@ function ExperimentMain() {
                 <NewExperiment onClick={() => setIsModalOpen(true)} />
                 </div>
                 <div className="w-[360px]">
-                <ExperimentContinue />
+                <ExperimentContinueCard />
                 </div>
             </div>
          </section>
@@ -110,4 +113,4 @@ function ExperimentMain() {
   );
 }
 
-export default ExperimentMain;
+export default ReportMain; 

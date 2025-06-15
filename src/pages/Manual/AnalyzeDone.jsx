@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
-import Header from '../components/Header';
-import equipment from '../assets/img/equipment.png';
-import AnalyzeBtn from '../components/button/analyzeBtn'; // 버튼 컴포넌트 추가
-import DotsSpinner from '../components/loadingSpinner';
+import Header from '../../components/Header';
+import ManualAllTextBtn from '../../components/button/manualAllTextBtn';
+import UploadCancleBtn from '../../components/button/UploadCancleBtn';
+import DangerResultBtn from '../../components/button/dangerResultBtn';
+import ManualUpdateBtn from '../../components/button/manualUpdateBtn';
 
-function ManualAnalyze() {
+function AnalyzeDone() {
   const fileInputRef = useRef();
   const [selectedFile, setSelectedFile] = useState(null); // ✅ 파일 상태 추가
 
@@ -29,17 +30,17 @@ function ManualAnalyze() {
           PDF 형식 매뉴얼을 업로드하면 AI가 핵심 위험 요소와 절차를 요약·분석해줍니다.
         </p>
 
-        <section className="bg-[#ecece7] h-[560px] rounded-lg p-10 mb-10 pt-[24px]">
-          <div className="max-w-[520px] mx-auto">
+        <section className="bg-[#ecece7] h-[560px] rounded-lg p-10 mb-10 pt-[24px] px-[100px] relative">
+          <section className="bg-[#EDF2FF] h-[450px] rounded-lg p-10 mb-10 pt-[24px]">
+          </section>
 
-            <div className="text-[#33308B] text-[26px] text-center mb-[10px] mt-[200px] font-[500]">
-              분 석 중
-            </div>
-            <div className="text-[#33308B] text-[16px] mb-[44px] text-center  font-[400]">
-              조금만 기다려주세요.
-            </div>
-
-            <DotsSpinner />
+          <div className="absolute bottom-5 right-[100px]">
+          <div className='flex gap-[10px]'> 
+            <ManualAllTextBtn />
+            <UploadCancleBtn />
+            <DangerResultBtn />
+            <ManualUpdateBtn />
+            </div> 
           </div>
         </section>
       </div>
@@ -47,4 +48,4 @@ function ManualAnalyze() {
   );
 }
 
-export default ManualAnalyze;
+export default AnalyzeDone;

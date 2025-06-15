@@ -6,7 +6,7 @@ const ExperimentContinue = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/experiment/create'); 
+    navigate('/ExperimentContinue'); 
   };
 
   return (

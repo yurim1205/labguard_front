@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
-import Header from '../components/Header';
-import equipment from '../assets/img/equipment.png';
-import AnalyzeBtn from '../components/button/analyzeBtn'; 
+import Header from '../../components/Header';
+import equipment from '../../assets/img/equipment.png';
+import AnalyzeBtn from '../../components/button/analyzeBtn'; 
 
 function ManualUpload() {
   const fileInputRef = useRef();

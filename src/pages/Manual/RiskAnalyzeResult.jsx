@@ -1,7 +1,5 @@
 import { useRef, useState } from 'react';
-import Header from '../components/Header';
-import ManualAllTextBtn from '../components/button/manualAllTextBtn';
-import ManualCancleBtn from '../components/button/manualCancleBtn';
+import Header from '../../components/Header';
 
 function RiskAnalyzeResult() {
   const fileInputRef = useRef();
