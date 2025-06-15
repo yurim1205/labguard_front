@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import Header from '../components/Header';
-import NewExperimentModal from '../components/modal/NewExperimentModal'; 
+
 import NewExperiment from '../components/NewExperiment';
 import ExperimentContinue from '../components/ExperimentContinue';
 
@@ -8,7 +8,6 @@ function ExperimentMain() {
   const fileInputRef = useRef();
   const [selectedFile, setSelectedFile] = useState(null);
   const [activeTab, setActiveTab] = useState('ongoing'); 
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 더미 매뉴얼 데이터
   const manuals = [
@@ -36,7 +35,6 @@ function ExperimentMain() {
   return (
     <>
       <Header />
-      {isModalOpen && <NewExperimentModal onClose={() => setIsModalOpen(false)} />}
       <div className="max-w-[1200px] mx-auto pt-10 pb-12">
         <h1 className="text-[2.3rem] font-black mb-[30px] text-left tracking-tight">실험</h1>
         <h2 className="text-[20px] font-bold text-left font-[500] mb-0">실험 진행</h2>
@@ -46,15 +44,15 @@ function ExperimentMain() {
         </p>
 
         <section className="h-[380px] rounded-lg p-10 mb-10 pt-[24px]">
-            <div className="flex justify-center gap-[96px] pt-[10px]">
+            <div className="flex justify-center gap-[72px] pt-[10px]">
                 <div className="w-[360px]">
-                <NewExperiment onClick={() => setIsModalOpen(true)} />
+                    <NewExperiment />
                 </div>
                 <div className="w-[360px]">
-                <ExperimentContinue />
+                    <ExperimentContinue />
                 </div>
             </div>
-         </section>
+        </section>
 
         {/* 내 실험 */}
         <section className="mt-[48px]">
