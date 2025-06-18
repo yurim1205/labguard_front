@@ -49,7 +49,7 @@ function ReportMain() {
                     <td className="px-6 py-3 border-b border-gray-200 underline text-blue-800">
                       {report.title}
                     </td>
-                    <td className="px-6 py-3 border-b border-gray-200 text-[#19234E]">{report.created_at}</td>
+                    <td className="px-6 py-3 border-b border-gray-200 font-[#19234E]">{report.created_at}</td>
                   </tr>
                 ))}
               </tbody>

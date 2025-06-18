@@ -4,7 +4,7 @@ import ReportDownloadBtn from '../../components/button/reportDownloadBtn';
 
 function ReportMake() {
   const fileInputRef = useRef();
-  const [selectedFile, setSelectedFile] = useState(null); 
+  const [selectedFile, setSelectedFile] = useState(null); // ✅ 파일 상태 추가
 
   // 더미 매뉴얼 데이터
   const manuals = [

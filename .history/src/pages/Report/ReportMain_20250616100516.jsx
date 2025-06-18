@@ -37,7 +37,7 @@ function ReportMain() {
             <table className="min-w-full table-auto border-collapse border border-gray-200">
               <thead className="bg-[#EDF0FA] text-left text-[#1C1C59]">
                 <tr>
-                  <th className="px-6 py-3 text-sm font-bold border-b border-gray-200 mr-[50px]">No</th>
+                  <th className="px-6 py-3 text-sm font-bold border-b border-gray-200">No</th>
                   <th className="px-6 py-3 text-sm font-bold border-b border-gray-200">제목</th>
                   <th className="px-6 py-3 text-sm font-bold border-b border-gray-200">생성일시</th>
                 </tr>
@@ -49,7 +49,7 @@ function ReportMain() {
                     <td className="px-6 py-3 border-b border-gray-200 underline text-blue-800">
                       {report.title}
                     </td>
-                    <td className="px-6 py-3 border-b border-gray-200 text-[#19234E]">{report.created_at}</td>
+                    <td className="px-6 py-3 border-b border-gray-200">{report.created_at}</td>
                   </tr>
                 ))}
               </tbody>
