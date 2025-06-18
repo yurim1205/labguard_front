@@ -1,3 +1,5 @@
+// RecentUpdateTable.jsx: 최근 업데이트 표 컴포넌트
+
 function RecentUpdateTable({ updates }) {
   return (
     <>

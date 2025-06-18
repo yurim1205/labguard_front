@@ -1,8 +1,10 @@
+// RecentUpdateTable.jsx: 최근 업데이트 표 컴포넌트
+
 function RecentUpdateTable({ updates }) {
   return (
     <>
       <h4 className="mb-3 text-[1.1rem] text-[#222]">최근 업데이트</h4>
-      <section className="mt-10 border border-[#222] rounded-2xl bg-white shadow-md p-6 pt-[10px]">
+      <section className="mt-10 border border-[#222] rounded-2xl bg-white shadow-md p-6 pt-[10px] mt-[10px]">
         <table className="w-full border-collapse bg-white">
           <tbody>
             {updates.map((item, idx) => (

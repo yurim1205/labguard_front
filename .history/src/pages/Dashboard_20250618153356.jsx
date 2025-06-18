@@ -25,7 +25,7 @@ function Dashboard() {
       imgSize: "w-[110px] h-[110px]",
       title: '리포트 확인',
       desc: '실험 상세 리포트를 확인하고 다운 받을 수 있습니다.',
-      link: '/ReportMain',
+      link: '/report',
     },
   ];
 

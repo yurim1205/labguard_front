@@ -30,7 +30,7 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
        
         <div className="mb-10 flex flex-col items-center justify-center">
         {/* 실험 제목 */}
-        <div className="mb-6 w-[280px] max-w-md mt-[20px]">
+        <div className="mb-6 w-[280px] max-w-md">
           <label className="block text-[16px] font-bold text-[#1C1C59] mb-2 text-center">실험 제목</label>
           <input
             type="text"
@@ -42,7 +42,7 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
         </div>
 
         {/* 실험 매뉴얼 */}
-        <div className="mb-6 w-[280px] max-w-md mt-[32px]">
+        <div className="w-full max-w-md">
           <label className="block text-[16px] font-bold text-[#1C1C59] mb-2 text-center">실험 매뉴얼</label>
           <select
             className="w-full border border-gray-400 rounded px-4 py-2 text-sm appearance-none"
@@ -57,16 +57,15 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
             ))}
           </select>
         </div>
+      </div>
 
         {/* 시작 버튼 */}
         <button
           onClick={handleSubmit}
-           className="bg-[#565991] hover:bg-[#4071c7] w-[146px] h-[48px] mt-[80px] text-[#ffffff] 
-           font-medium py-3 rounded-full transition text-[16px] border-none shadow-[0_12px_24px_0_rgba(128,128,128,0.5)]"
-            >
+          className="w-full bg-[#33308B] text-white text-sm font-semibold py-3 rounded hover:bg-[#2a286a] transition"
+        >
           실험 시작
         </button>
-        </div>
       </div>
     </div>
   );

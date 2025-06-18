@@ -27,11 +27,9 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
         <p className="text-[14px] text-[#5F6E9C] text-center mb-8">
           실험을 시작하기 전에 환경을 세팅해주세요.
         </p>
-       
-        <div className="mb-10 flex flex-col items-center justify-center">
         {/* 실험 제목 */}
-        <div className="mb-6 w-[280px] max-w-md mt-[20px]">
-          <label className="block text-[16px] font-bold text-[#1C1C59] mb-2 text-center">실험 제목</label>
+        <div className="mb-6 items-center">
+          <label className="block text-[16px] font-bold text-[#1C1C59] mb-2">실험 제목</label>
           <input
             type="text"
             placeholder="실험 제목을 입력해주세요."
@@ -40,10 +38,9 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
             className="w-full border border-gray-400 rounded px-4 py-2 text-sm"
           />
         </div>
-
         {/* 실험 매뉴얼 */}
-        <div className="mb-6 w-[280px] max-w-md mt-[32px]">
-          <label className="block text-[16px] font-bold text-[#1C1C59] mb-2 text-center">실험 매뉴얼</label>
+        <div className="mb-10">
+          <label className="block text-[16px] font-bold text-[#1C1C59] mb-2">실험 매뉴얼</label>
           <select
             className="w-full border border-gray-400 rounded px-4 py-2 text-sm appearance-none"
             value={selectedManual}
@@ -57,16 +54,13 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
             ))}
           </select>
         </div>
-
         {/* 시작 버튼 */}
         <button
           onClick={handleSubmit}
-           className="bg-[#565991] hover:bg-[#4071c7] w-[146px] h-[48px] mt-[80px] text-[#ffffff] 
-           font-medium py-3 rounded-full transition text-[16px] border-none shadow-[0_12px_24px_0_rgba(128,128,128,0.5)]"
-            >
+          className="w-full bg-[#33308B] text-white text-sm font-semibold py-3 rounded hover:bg-[#2a286a] transition"
+        >
           실험 시작
         </button>
-        </div>
       </div>
     </div>
   );

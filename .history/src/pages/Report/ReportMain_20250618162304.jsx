@@ -31,7 +31,7 @@ function ReportMain() {
 
         {/* 내 실험 */}
         <section className="mt-[48px]">
-        <h2 className="text-[16px] font-bold mb-3 text-left">
+        <h2 className="text-[14px] font-bold mb-3 text-left">
           총 {reports.length}개
         </h2>
           <div className="overflow-x-auto">
