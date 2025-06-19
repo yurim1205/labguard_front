@@ -7,7 +7,6 @@ import ManualAnalyzeLoading from '../../components/ManualAnalyzeLoading';
 function ManualUpload() {
   const fileInputRef = useRef();
   const [selectedFile, setSelectedFile] = useState(null); 
-  const [isLoading, setIsLoading] = useState(false);
 
   // 더미 매뉴얼 데이터
   const manuals = [
@@ -18,12 +17,6 @@ function ManualUpload() {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) setSelectedFile(file);
-  };
-
-  const handleAnalyze = () => {
-    setIsLoading(true);
-    // 분석 API 호출 등 비동기 작업
-    // 예시: setTimeout(() => setIsLoading(false), 3000);
   };
 
   return (

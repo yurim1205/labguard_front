@@ -130,6 +130,14 @@ function ExperimentMain() {
             ))}
           </ul>
         </section>
+
+        <section className="bg-[#ecece7] h-[560px] rounded-lg p-10 mb-10 pt-[24px] flex items-center justify-center">
+          {isLoading ? (
+            <ManualAnalyzeLoading />
+          ) : (
+            <AnalyzeBtn onClick={handleAnalyze} />
+          )}
+        </section>
       </div>
     </>
   );

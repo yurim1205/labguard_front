@@ -2,12 +2,10 @@ import { useRef, useState } from 'react';
 import Header from '../../components/Header';
 import equipment from '../../assets/img/equipment.png';
 import AnalyzeBtn from '../../components/button/analyzeBtn'; 
-import ManualAnalyzeLoading from '../../components/ManualAnalyzeLoading';
 
 function ManualUpload() {
   const fileInputRef = useRef();
   const [selectedFile, setSelectedFile] = useState(null); 
-  const [isLoading, setIsLoading] = useState(false);
 
   // 더미 매뉴얼 데이터
   const manuals = [
@@ -18,12 +16,6 @@ function ManualUpload() {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) setSelectedFile(file);
-  };
-
-  const handleAnalyze = () => {
-    setIsLoading(true);
-    // 분석 API 호출 등 비동기 작업
-    // 예시: setTimeout(() => setIsLoading(false), 3000);
   };
 
   return (
@@ -38,18 +30,13 @@ function ManualUpload() {
 
         {/* 실험 업로드 영역 */}
         <section className="bg-[#ecece7] rounded-lg p-10 mb-10 pt-[24px]">
-          <div className="max-w-[520px] mx-auto">
-          <section className="bg-[#ecece7] h-[560px] rounded-lg p-10 mb-10 pt-[24px] flex items-center justify-center">
+        <section className="bg-[#ecece7] h-[560px] rounded-lg p-10 mb-10 pt-[24px] flex items-center justify-center">
           {isLoading ? (
             <ManualAnalyzeLoading />
           ) : (
             <AnalyzeBtn onClick={handleAnalyze} />
           )}
         </section>
-            <div className="text-[#888] text-[14px] mb-[44px] text-left mt-[12px]">
-              · 파일 업로드는 PDF 형식만 가능하며, 용량은 30MB 이하로 제한됩니다.
-            </div>
-          </div>
         </section>
 
         {/* 내 매뉴얼 */}

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import ExperimentStartBtn from '../button/experimentStartBtn';
 
 const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
-  const [title, setTitle] = useState(''); // 실험 제목 상태
+  const [experiment_name, setExperimentName] = useState(''); // 실험 제목 상태
   const [selectedManual, setSelectedManual] = useState(''); // 매뉴얼 선택 상태
 
   const handleSubmit = () => {
-    if (title.trim()) {
-      onTitleSubmit({ title, manual: selectedManual }); // 제목과 선택한 매뉴얼 전달
+    if (experiment_name.trim()) {
+      onTitleSubmit({ experiment_name, manual: selectedManual }); // 제목과 선택한 매뉴얼 전달
       onClose(); // 모달 닫기
     }
   };
@@ -35,9 +36,9 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
           <input
             type="text"
             placeholder="실험 제목을 입력해주세요."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full border border-gray-400 rounded px-4 py-2 text-sm"
+            value={experiment_name}
+            onChange={(e) => setExperimentName(e.target.value)}
+            className="w-full border border-gray-400 rounded px-4 py-2 text-sm h-[28px]"
           />
         </div>
 
@@ -45,27 +46,20 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
         <div className="mb-6 w-[280px] max-w-md mt-[32px]">
           <label className="block text-[16px] font-bold text-[#1C1C59] mb-2 text-center">실험 매뉴얼</label>
           <select
-            className="w-full border border-gray-400 rounded px-4 py-2 text-sm appearance-none"
+            className="w-full border border-gray-400 rounded px-4 py-2 text-sm appearance-none h-[28px]"
             value={selectedManual}
             onChange={(e) => setSelectedManual(e.target.value)}
           >
             <option value="">실험 매뉴얼 선택</option>
             {manuals.map((manual, idx) => (
-              <option key={idx} value={manual.name}>
+              <option key={idx} value={manual.manual_id}>
                 {manual.name}
               </option>
             ))}
           </select>
         </div>
 
-        {/* 시작 버튼 */}
-        <button
-          onClick={handleSubmit}
-           className="bg-[#565991] hover:bg-[#4071c7] w-[146px] h-[48px] mt-[80px] text-[#ffffff] 
-           font-medium py-3 rounded-full transition text-[16px] border-none shadow-[0_12px_24px_0_rgba(128,128,128,0.5)]"
-            >
-          실험 시작
-        </button>
+       <ExperimentStartBtn onClick={handleSubmit} />
         </div>
       </div>
     </div>

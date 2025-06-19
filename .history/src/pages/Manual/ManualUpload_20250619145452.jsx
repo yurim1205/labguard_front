@@ -20,12 +20,6 @@ function ManualUpload() {
     if (file) setSelectedFile(file);
   };
 
-  const handleAnalyze = () => {
-    setIsLoading(true);
-    // 분석 API 호출 등 비동기 작업
-    // 예시: setTimeout(() => setIsLoading(false), 3000);
-  };
-
   return (
     <>
       <Header />
