@@ -20,12 +20,6 @@ function ManualUpload() {
     if (file) setSelectedFile(file);
   };
 
-  const handleAnalyze = () => {
-    setIsLoading(true);
-    // 분석 API 호출 등 비동기 작업
-    // 예: setTimeout(() => setIsLoading(false), 3000);
-  };
-
   return (
     <>
       <Header />
@@ -39,45 +33,13 @@ function ManualUpload() {
         {/* 실험 업로드 영역 */}
         <section className="bg-[#ecece7] rounded-lg p-10 mb-10 pt-[24px]">
           <div className="max-w-[520px] mx-auto">
-          <div className="border border-dashed border-[#b5b5b5] rounded-lg bg-[#FFFFFF] shadow-[0_6px_12px_0_rgba(128,128,128,0.28)] min-h-[360px] flex flex-col items-center justify-center p-10 text-center gap-4">
-            {!selectedFile ? (
-              <>
-                <div className="font-[500] text-[#0E467B] text-lg">첨부할 파일 놓기</div>
-                <div className="text-base text-[#798483] mt-[10px]">또는</div>
-                <label
-                  htmlFor="file-upload"
-                  className="mt-[10px] font-[500] rounded-[3px] shadow-[0_6px_12px_0_rgba(128,128,128,0.28)] inline-block bg-white text-[#0E467B] border border-[#0E467B] px-[10px] py-[2px] font-semibold text-base cursor-pointer transition-colors duration-200 hover:text-white"
-                >
-                  파일 선택
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept=".pdf"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </>
-            ) : (
-              <div className="flex flex-col items-center gap-3">
-           <section className="h-[260px] rounded-lg p-10 mb-10 pt-[24px] flex flex-col items-center justify-center gap-6">
-  {!isLoading && (
-    <div className="bg-[#cfe3ff] text-[#0E467B] px-6 py-2 rounded-full text-[15px] font-medium">
-      {selectedFile.name}
-    </div>
-  )}
-  {isLoading ? (
-    <ManualAnalyzeLoading />
-  ) : (
-    <AnalyzeBtn onClick={handleAnalyze} />
-  )}
-</section>
-
-              </div>
-            )}
-          </div>
-
+          <section className="bg-[#ecece7] h-[560px] rounded-lg p-10 mb-10 pt-[24px] flex items-center justify-center">
+          {isLoading ? (
+            <ManualAnalyzeLoading />
+          ) : (
+            <AnalyzeBtn onClick={handleAnalyze} />
+          )}
+        </section>
             <div className="text-[#888] text-[14px] mb-[44px] text-left mt-[12px]">
               · 파일 업로드는 PDF 형식만 가능하며, 용량은 30MB 이하로 제한됩니다.
             </div>

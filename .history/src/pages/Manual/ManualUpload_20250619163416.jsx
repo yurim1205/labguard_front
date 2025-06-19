@@ -61,12 +61,10 @@ function ManualUpload() {
               </>
             ) : (
               <div className="flex flex-col items-center gap-3">
-           <section className="h-[260px] rounded-lg p-10 mb-10 pt-[24px] flex flex-col items-center justify-center gap-6">
-  {!isLoading && (
-    <div className="bg-[#cfe3ff] text-[#0E467B] px-6 py-2 rounded-full text-[15px] font-medium">
-      {selectedFile.name}
-    </div>
-  )}
+             <section className="h-[260px] rounded-lg p-10 mb-10 pt-[24px] flex flex-col items-center justify-center gap-6">
+  <div className="bg-[#cfe3ff] text-[#0E467B] px-6 py-2 rounded-full text-[15px] font-medium">
+    {selectedFile.name}
+  </div>
   {isLoading ? (
     <ManualAnalyzeLoading />
   ) : (

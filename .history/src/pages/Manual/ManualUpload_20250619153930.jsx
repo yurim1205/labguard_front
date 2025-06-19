@@ -2,12 +2,10 @@ import { useRef, useState } from 'react';
 import Header from '../../components/Header';
 import equipment from '../../assets/img/equipment.png';
 import AnalyzeBtn from '../../components/button/analyzeBtn'; 
-import ManualAnalyzeLoading from '../../components/ManualAnalyzeLoading';
 
 function ManualUpload() {
   const fileInputRef = useRef();
   const [selectedFile, setSelectedFile] = useState(null); 
-  const [isLoading, setIsLoading] = useState(false);
 
   // 더미 매뉴얼 데이터
   const manuals = [
@@ -18,12 +16,6 @@ function ManualUpload() {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) setSelectedFile(file);
-  };
-
-  const handleAnalyze = () => {
-    setIsLoading(true);
-    // 분석 API 호출 등 비동기 작업
-    // 예: setTimeout(() => setIsLoading(false), 3000);
   };
 
   return (
@@ -42,11 +34,11 @@ function ManualUpload() {
           <div className="border border-dashed border-[#b5b5b5] rounded-lg bg-[#FFFFFF] shadow-[0_6px_12px_0_rgba(128,128,128,0.28)] min-h-[360px] flex flex-col items-center justify-center p-10 text-center gap-4">
             {!selectedFile ? (
               <>
-                <div className="font-[500] text-[#0E467B] text-lg">첨부할 파일 놓기</div>
-                <div className="text-base text-[#798483] mt-[10px]">또는</div>
+                <div className="font-[600] text-[#0E467B] text-lg">첨부할 파일 놓기</div>
+                <div className="text-base text-[#798483]">또는</div>
                 <label
                   htmlFor="file-upload"
-                  className="mt-[10px] font-[500] rounded-[3px] shadow-[0_6px_12px_0_rgba(128,128,128,0.28)] inline-block bg-white text-[#0E467B] border border-[#0E467B] px-[10px] py-[2px] font-semibold text-base cursor-pointer transition-colors duration-200 hover:text-white"
+                  className="rounded-[3px] shadow-[0_6px_12px_0_rgba(128,128,128,0.28)] inline-block bg-white text-[#0E467B] border border-[#0E467B] px-6 py-2 font-semibold text-base cursor-pointer transition-colors duration-200 hover:text-white"
                 >
                   파일 선택
                 </label>
@@ -61,19 +53,10 @@ function ManualUpload() {
               </>
             ) : (
               <div className="flex flex-col items-center gap-3">
-           <section className="h-[260px] rounded-lg p-10 mb-10 pt-[24px] flex flex-col items-center justify-center gap-6">
-  {!isLoading && (
-    <div className="bg-[#cfe3ff] text-[#0E467B] px-6 py-2 rounded-full text-[15px] font-medium">
-      {selectedFile.name}
-    </div>
-  )}
-  {isLoading ? (
-    <ManualAnalyzeLoading />
-  ) : (
-    <AnalyzeBtn onClick={handleAnalyze} />
-  )}
-</section>
-
+                <div className="bg-[#cfe3ff] text-[#0E467B] px-6 py-2 rounded-full text-[15px] font-medium">
+                  {selectedFile.name}
+                </div>
+                <AnalyzeBtn onClick={() => alert('분석 시작')} />
               </div>
             )}
           </div>
