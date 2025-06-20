@@ -24,11 +24,10 @@ function ExperimentChat() {
   const [mode, setMode] = useState('text'); // 입력 모드
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [statusText, setStatusText] = useState('');
+  const [status, setStatus] = useState({ text: '', type: 'idle' });
+  const [isProcessing, setIsProcessing] = useState(false);
   const [audioUrl, setAudioUrl] = useState('');
   const chatContainerRef = useRef(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [status, setStatus] = useState({ text: '', type: 'idle' });
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -60,15 +59,31 @@ function ExperimentChat() {
     setIsProcessing(true);
     setStatus({ text: 'AI가 답변을 생성하고 있습니다...', type: 'info' });
 
-    // AI 봇 응답 시뮬레이션 (setTimeout 사용)
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { sender: 'bot', text: `'${prev[prev.length - 1].text}'에 대한 더미 답변입니다.` },
-      ]);
+    try {
+      const response = await fetch('/agent/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          manual_id: experimentDetails.manual, // 실제 매뉴얼 ID
+          message: input,
+          user_id: 'web_user', // 실제 사용자 ID
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessages((prev) => [...prev, { sender: 'bot', text: data.response_text }]);
+        setStatus({ text: '', type: 'idle' });
+      } else {
+        setStatus({ text: `오류: ${data.error || '알 수 없는 오류'}`, type: 'error' });
+      }
+    } catch (error) {
+      console.error('AI 응답 요청 오류:', error);
+      setStatus({ text: '서버와 통신 중 오류가 발생했습니다.', type: 'error' });
+    } finally {
       setIsProcessing(false);
-      setStatus({ text: '', type: 'idle' });
-    }, 1500);
+    }
   };
   
   const handleInputChange = (e) => {
@@ -88,7 +103,21 @@ function ExperimentChat() {
         음성 입력 필요 시 "진영아"라고 부른 후 내용을 말해주세요. <br /><br />
         남긴 실험 로그를 바탕으로 리포트가 자동 생성됩니다.
       </p>
+  
+      {/* 브리핑 / 질문 로그 */}
+      {/* <section className="bg-[#ecece7] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[200px] overflow-y-scroll">
+        <div>
+          <p>매뉴얼 브리핑 내용</p>
+        </div>
+      </section>
+  
+      <section className="bg-[#BAC9F0] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[150px] overflow-y-scroll ml-auto">
+        <div className="text-right">
+          <p>사용자 질문 내용</p>
+        </div>
+      </section> */}
 
+    {/* 전체 채팅 영역을 감싸는 div 추가 */}
     <div className="bg-[#f8f9fa] p-6 rounded-xl shadow-sm mb-10">
       <section
         ref={chatContainerRef}
@@ -121,7 +150,7 @@ function ExperimentChat() {
       {/* 입력 모드 UI 삽입 */}
       <div className="w-[600px] mx-auto mb-12">
         <InputModeToggle mode={mode} setMode={setMode} />
-        <StatusBar message={statusText} type={isRecording ? 'recording' : 'idle'} />
+        <StatusBar message={status.text} type={status.type} />
   
         {mode === 'voice' ? (
           <>
@@ -137,7 +166,7 @@ function ExperimentChat() {
             input={input}
             onInput={handleInputChange}
             onSend={handleSend}
-            disabled={false}
+            disabled={isProcessing}
           />
         )}
       </div>

@@ -8,20 +8,15 @@ function Signup() {
     company_id: '',
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8000/api/user/signup", {
+      const response = await fetch("http://localhost:8000/api/users/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),  // form은 { name, password, company_id } 등
+        body: JSON.stringify(form), 
       });
   
       if (!response.ok) {
@@ -30,11 +25,12 @@ function Signup() {
       }
   
       alert("회원가입 성공!");
-      navigate("/login") 
+      // 예: navigate("/login") 또는 토큰 저장 등
     } catch (error) {
       alert("회원가입 실패: " + error.message);
     }
   };
+  
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#5D93E4] to-[#E2ECFF] gap-8">

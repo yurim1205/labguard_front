@@ -43,6 +43,7 @@ const handleSubmit = async (e) => {
   }
 };
 
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#5D93E4] to-[#E2ECFF] gap-8">
       <div className="w-[500px] h-[700px] rounded-[40px] shadow-md items-center justify-start bg-[#FFFFFF] shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]">
@@ -53,9 +54,9 @@ const handleSubmit = async (e) => {
               <label className="block text-[#837A7A] text-[14px] w-[300px] h-[30px] mt-[28px]">이름</label>
               <input
                 className="border border-[#3C66B8] rounded-full px-5 py-2 w-full h-[36px] focus:outline-none focus:ring-2 focus:ring-blue-300 text-lg"
-                type="name"
-                name="name"
-                value={form.name}
+                type="email"
+                name="email"
+                value={form.email}
                 onChange={handleChange}
               />
             </div>

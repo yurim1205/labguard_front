@@ -27,8 +27,6 @@ function ExperimentChat() {
   const [statusText, setStatusText] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
   const chatContainerRef = useRef(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [status, setStatus] = useState({ text: '', type: 'idle' });
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -51,24 +49,20 @@ function ExperimentChat() {
     setStatusText(isRecording ? '녹음 중지됨' : '녹음 중...');
   };
   
-  const handleSend = async () => {
-    if (input.trim() === '' || isProcessing) return;
+  const handleSend = () => {
+    if (input.trim() === '') return;
 
     const newMessage = { sender: 'user', text: input };
     setMessages((prev) => [...prev, newMessage]);
     setInput('');
-    setIsProcessing(true);
-    setStatus({ text: 'AI가 답변을 생성하고 있습니다...', type: 'info' });
 
-    // AI 봇 응답 시뮬레이션 (setTimeout 사용)
+    // AI 봇 응답 시뮬레이션
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
-        { sender: 'bot', text: `'${prev[prev.length - 1].text}'에 대한 더미 답변입니다.` },
+        { sender: 'bot', text: '네, 질문에 대해 답변해 드릴게요.' },
       ]);
-      setIsProcessing(false);
-      setStatus({ text: '', type: 'idle' });
-    }, 1500);
+    }, 1000);
   };
   
   const handleInputChange = (e) => {
@@ -88,7 +82,21 @@ function ExperimentChat() {
         음성 입력 필요 시 "진영아"라고 부른 후 내용을 말해주세요. <br /><br />
         남긴 실험 로그를 바탕으로 리포트가 자동 생성됩니다.
       </p>
+  
+      {/* 브리핑 / 질문 로그 */}
+      {/* <section className="bg-[#ecece7] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[200px] overflow-y-scroll">
+        <div>
+          <p>매뉴얼 브리핑 내용</p>
+        </div>
+      </section>
+  
+      <section className="bg-[#BAC9F0] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[150px] overflow-y-scroll ml-auto">
+        <div className="text-right">
+          <p>사용자 질문 내용</p>
+        </div>
+      </section> */}
 
+    {/* 전체 채팅 영역을 감싸는 div 추가 */}
     <div className="bg-[#f8f9fa] p-6 rounded-xl shadow-sm mb-10">
       <section
         ref={chatContainerRef}

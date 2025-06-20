@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import SignupBtn from "../components/button/signupBtn";
 
 function Signup() {
@@ -16,23 +17,11 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8000/api/user/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),  // form은 { name, password, company_id } 등
-      });
-  
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.detail || "회원가입 실패");
-      }
-  
+      const res = await axios.post("http://localhost:8000/api/users/signup", form);
       alert("회원가입 성공!");
-      navigate("/login") 
-    } catch (error) {
-      alert("회원가입 실패: " + error.message);
+      // 로그인 페이지 이동 또는 토큰 저장 등 추가
+    } catch (err) {
+      alert("회원가입 실패: " + (err.response?.data?.detail || err.message));
     }
   };
 

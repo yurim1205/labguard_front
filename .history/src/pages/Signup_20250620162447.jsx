@@ -30,7 +30,7 @@ function Signup() {
       }
   
       alert("회원가입 성공!");
-      navigate("/login") 
+      // 예: navigate("/login") 또는 토큰 저장 등
     } catch (error) {
       alert("회원가입 실패: " + error.message);
     }

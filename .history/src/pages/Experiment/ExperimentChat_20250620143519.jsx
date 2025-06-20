@@ -88,7 +88,21 @@ function ExperimentChat() {
         음성 입력 필요 시 "진영아"라고 부른 후 내용을 말해주세요. <br /><br />
         남긴 실험 로그를 바탕으로 리포트가 자동 생성됩니다.
       </p>
+  
+      {/* 브리핑 / 질문 로그 */}
+      {/* <section className="bg-[#ecece7] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[200px] overflow-y-scroll">
+        <div>
+          <p>매뉴얼 브리핑 내용</p>
+        </div>
+      </section>
+  
+      <section className="bg-[#BAC9F0] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[150px] overflow-y-scroll ml-auto">
+        <div className="text-right">
+          <p>사용자 질문 내용</p>
+        </div>
+      </section> */}
 
+    {/* 전체 채팅 영역을 감싸는 div 추가 */}
     <div className="bg-[#f8f9fa] p-6 rounded-xl shadow-sm mb-10">
       <section
         ref={chatContainerRef}

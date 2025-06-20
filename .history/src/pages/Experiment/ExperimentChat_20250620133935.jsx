@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '../../components/Header';
 import ChatInput from '../../components/ChatInput';
@@ -15,26 +15,11 @@ function ExperimentChat() {
     experiment_name: location.state?.experiment_name || '실험 제목 없음',
     manual: location.state?.manual || '매뉴얼 선택 안 됨',
   });
-  const [messages, setMessages] = useState([
-    {
-      sender: 'bot',
-      text: '안녕하세요! 실험에 대해 질문해주세요. 🧑‍🔬',
-    },
-  ]);
   const [mode, setMode] = useState('text'); // 입력 모드
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [statusText, setStatusText] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
-  const chatContainerRef = useRef(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [status, setStatus] = useState({ text: '', type: 'idle' });
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
 
   // 더미 매뉴얼 데이터
   const manuals = [
@@ -51,24 +36,9 @@ function ExperimentChat() {
     setStatusText(isRecording ? '녹음 중지됨' : '녹음 중...');
   };
   
-  const handleSend = async () => {
-    if (input.trim() === '' || isProcessing) return;
-
-    const newMessage = { sender: 'user', text: input };
-    setMessages((prev) => [...prev, newMessage]);
+  const handleSend = () => {
+    console.log('보낸 입력:', input);
     setInput('');
-    setIsProcessing(true);
-    setStatus({ text: 'AI가 답변을 생성하고 있습니다...', type: 'info' });
-
-    // AI 봇 응답 시뮬레이션 (setTimeout 사용)
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { sender: 'bot', text: `'${prev[prev.length - 1].text}'에 대한 더미 답변입니다.` },
-      ]);
-      setIsProcessing(false);
-      setStatus({ text: '', type: 'idle' });
-    }, 1500);
   };
   
   const handleInputChange = (e) => {
@@ -88,33 +58,27 @@ function ExperimentChat() {
         음성 입력 필요 시 "진영아"라고 부른 후 내용을 말해주세요. <br /><br />
         남긴 실험 로그를 바탕으로 리포트가 자동 생성됩니다.
       </p>
+  
+      {/* 브리핑 / 질문 로그 */}
+      {/* <section className="bg-[#ecece7] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[200px] overflow-y-scroll">
+        <div>
+          <p>매뉴얼 브리핑 내용</p>
+        </div>
+      </section>
+  
+      <section className="bg-[#BAC9F0] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[150px] overflow-y-scroll ml-auto">
+        <div className="text-right">
+          <p>사용자 질문 내용</p>
+        </div>
+      </section> */}
 
+    {/* 전체 채팅 영역을 감싸는 div 추가 */}
     <div className="bg-[#f8f9fa] p-6 rounded-xl shadow-sm mb-10">
-      <section
-        ref={chatContainerRef}
-        className="bg-white rounded-lg shadow-md p-4 h-[400px] overflow-y-auto space-y-4"
-      >
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              msg.sender === 'user' ? 'justify-end' : 'justify-start'
-            }`}
-          >
-            <div
-              className={`rounded-xl px-4 py-3 text-sm max-w-[80%] ${
-                msg.sender === 'user'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-gray-800'
-              }`}
-            >
-              {msg.sender === 'bot' && (
-                <strong className="font-bold block mb-1">AI 챗봇</strong>
-              )}
-              {msg.text}
-            </div>
-          </div>
-        ))}
+      <section className="bg-white rounded-lg shadow-md p-4 min-h-[400px]">
+        <div className="bg-green-100 rounded-xl px-4 py-3 text-sm text-green-900 font-semibold inline-block max-w-[90%]">
+          <strong className="font-bold text-green-800">AI 챗봇:</strong>
+          <span className="ml-1">안녕하세요! 실험에 대해 질문해주세요. 🧑‍🔬</span>
+        </div>
       </section>
     </div>
   

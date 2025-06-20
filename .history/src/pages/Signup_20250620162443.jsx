@@ -30,11 +30,12 @@ function Signup() {
       }
   
       alert("회원가입 성공!");
-      navigate("/login") 
+      // 예: navigate("/login") 또는 토큰 저장 등
     } catch (error) {
       alert("회원가입 실패: " + error.message);
     }
   };
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#5D93E4] to-[#E2ECFF] gap-8">
