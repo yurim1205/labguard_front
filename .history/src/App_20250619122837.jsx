@@ -11,7 +11,6 @@ import ExperimentChat from './pages/Experiment/ExperimentChat';
 import ReportMake from './pages/Report/ReportMake';
 import ExperimentContinue from './pages/Experiment/ExperimentContinue';
 import ReportMain from './pages/Report/ReportMain';
-import ReportRead from './pages/Report/ReportRead';
 
 function App() {
   return (
@@ -30,7 +29,6 @@ function App() {
         <Route path="/ReportMake" element={<ReportMake />} />
         <Route path="/ExperimentContinue" element={<ExperimentContinue />} />
         <Route path="/ReportMain" element={<ReportMain />} />
-        <Route path="/ReportRead" element={<ReportRead />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
     </Router>

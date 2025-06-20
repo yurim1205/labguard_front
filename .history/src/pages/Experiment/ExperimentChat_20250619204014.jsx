@@ -60,7 +60,7 @@ function ExperimentChat() {
       </p>
   
       {/* 브리핑 / 질문 로그 */}
-      {/* <section className="bg-[#ecece7] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[200px] overflow-y-scroll">
+      <section className="bg-[#ecece7] w-[600px] rounded-[10px] p-10 mb-10 pt-[24px] px-[100px] relative h-[200px] overflow-y-scroll">
         <div>
           <p>매뉴얼 브리핑 내용</p>
         </div>
@@ -70,17 +70,14 @@ function ExperimentChat() {
         <div className="text-right">
           <p>사용자 질문 내용</p>
         </div>
-      </section> */}
-
-    {/* 전체 채팅 영역을 감싸는 div 추가 */}
-    <div className="bg-[#f8f9fa] p-6 rounded-xl shadow-sm mb-10">
-      <section className="bg-white rounded-lg shadow-md p-4 min-h-[200px]">
-        <div className="bg-green-100 rounded-xl px-4 py-3 text-sm text-green-900 font-semibold inline-block max-w-[90%]">
-          <strong className="font-bold text-green-800">AI 챗봇:</strong>
-          <span className="ml-1">안녕하세요! 실험에 대해 질문해주세요. 🧑‍🔬</span>
-        </div>
       </section>
-    </div>
+
+      <section className="bg-white rounded-lg shadow-md p-4 mb-10 min-h-[200px]">
+  <div className="bg-green-100 rounded-xl px-4 py-3 text-sm text-green-900 font-semibold inline-block max-w-[90%]">
+    <strong className="font-bold text-green-800">AI 챗봇:</strong>
+    <span className="ml-1">안녕하세요! 실험 매뉴얼을 선택하고 질문해주세요. 🧑‍🔬</span>
+  </div>
+</section>
   
       {/* 입력 모드 UI 삽입 */}
       <div className="w-[600px] mx-auto mb-12">

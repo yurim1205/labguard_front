@@ -72,15 +72,12 @@ function ExperimentChat() {
         </div>
       </section> */}
 
-    {/* 전체 채팅 영역을 감싸는 div 추가 */}
-    <div className="bg-[#f8f9fa] p-6 rounded-xl shadow-sm mb-10">
-      <section className="bg-white rounded-lg shadow-md p-4 min-h-[200px]">
+      <section className="bg-white rounded-lg shadow-md p-4 mb-10 min-h-[200px]">
         <div className="bg-green-100 rounded-xl px-4 py-3 text-sm text-green-900 font-semibold inline-block max-w-[90%]">
           <strong className="font-bold text-green-800">AI 챗봇:</strong>
-          <span className="ml-1">안녕하세요! 실험에 대해 질문해주세요. 🧑‍🔬</span>
+          <span className="ml-1">안녕하세요! 실험 매뉴얼을 선택하고 질문해주세요. 🧑‍🔬</span>
         </div>
       </section>
-    </div>
   
       {/* 입력 모드 UI 삽입 */}
       <div className="w-[600px] mx-auto mb-12">

@@ -77,7 +77,7 @@ function ExperimentChat() {
       <section className="bg-white rounded-lg shadow-md p-4 min-h-[200px]">
         <div className="bg-green-100 rounded-xl px-4 py-3 text-sm text-green-900 font-semibold inline-block max-w-[90%]">
           <strong className="font-bold text-green-800">AI 챗봇:</strong>
-          <span className="ml-1">안녕하세요! 실험에 대해 질문해주세요. 🧑‍🔬</span>
+          <span className="ml-1">안녕하세요! 실험 매뉴얼을 선택하고 질문해주세요. 🧑‍🔬</span>
         </div>
       </section>
     </div>
