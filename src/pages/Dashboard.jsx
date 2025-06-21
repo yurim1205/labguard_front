@@ -1,11 +1,14 @@
 import Header from '../components/Header';
 import MenuCard from '../components/MenuCard';
 import RecentUpdateTable from '../components/RecentUpdateTable';
+import { useAuthStore } from '../store/useAuthStore';
 import manual from '../assets/img/manual.png';
 import experiment from '../assets/img/experiment.png';
 import report from '../assets/img/report.png';
 
 function Dashboard() {
+  const user = useAuthStore((state) => state.user);
+
   // 카드 메뉴 데이터
   const cards = [
     {
@@ -40,7 +43,7 @@ function Dashboard() {
       <Header />
       <main className="max-w-[1100px] mx-auto">
         <h2 className="text-2xl mb-10 text-neutral-900 font-normal">
-          안녕하세요, <span className="font-bold">{}</span>님
+          안녕하세요, <span className="font-bold">{user?.name || '사용자'}</span>님
         </h2>
         <div className="flex gap-[20px] justify-center">
           {cards.map((card, idx) => (

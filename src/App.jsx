@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAuthStore } from './store/useAuthStore';
 import Dashboard from './pages/Dashboard';
 import ManualUpload from './pages/Manual/ManualUpload';
 import AnalyzeDone from './pages/Manual/AnalyzeDone';
@@ -14,6 +16,46 @@ import ReportMain from './pages/Report/ReportMain';
 import ReportRead from './pages/Report/ReportRead';
 
 function App() {
+  const { login, token } = useAuthStore();
+
+  // 앱 시작 시 세션 복원
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        console.log("Attempting to restore session...");
+        
+        // 저장된 토큰이 있으면 사용
+        const headers = {
+          "Content-Type": "application/json",
+        };
+        
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch("http://localhost:8000/api/user/me", {
+          method: "GET",
+          headers: headers,
+          credentials: "include", // 쿠키 포함
+        });
+
+        console.log("Session restore response status:", response.status);
+        
+        if (response.ok) {
+          const userData = await response.json();
+          console.log("Restored user data:", userData);
+          login(userData, token);
+        } else {
+          console.log("Session restore failed - response not ok");
+        }
+      } catch (error) {
+        console.log("No active session found:", error);
+      }
+    };
+
+    restoreSession();
+  }, [login, token]);
+
   return (
     <Router>
       <Routes>

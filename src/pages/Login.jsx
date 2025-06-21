@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import logo from "../assets/img/logo.png";
 import LoginBtn from "../components/button/loginBtn";
 import { Link, useNavigate  } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
 function Login() {
   const [form, setForm] = useState({
@@ -25,6 +26,9 @@ const handleSubmit = async (e) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(form),
+
+       // ✅ 쿠키 포함해서 요청
+        credentials: "include"
     });
 
     if (!response.ok) {
@@ -33,11 +37,51 @@ const handleSubmit = async (e) => {
     }
 
     const data = await response.json();
-    const token = data.access_token;
+    
+    // 백엔드 응답 데이터 확인
+    console.log('Login response data:', data);
+    
+    // 토큰을 사용해서 사용자 정보 가져오기
+    try {
+      const userResponse = await fetch("http://localhost:8000/api/user/me", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${data.access_token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include"
+      });
 
-    localStorage.setItem("token", token); // 토큰 저장
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        console.log('User data:', userData);
+        
+        // 사용자 정보를 store에 저장
+        useAuthStore.getState().login({
+          name: userData.name || form.email,
+          email: userData.email || form.email,
+          company_id: userData.company_id
+        }, data.access_token);
+      } else {
+        // 사용자 정보 가져오기 실패 시 기본값 사용
+        useAuthStore.getState().login({
+          name: form.email, // 이메일을 이름으로 사용
+          email: form.email,
+          company_id: 1
+        }, data.access_token);
+      }
+    } catch (userError) {
+      console.error('Failed to fetch user data:', userError);
+      // 사용자 정보 가져오기 실패 시 기본값 사용
+      useAuthStore.getState().login({
+        name: form.email,
+        email: form.email,
+        company_id: 1
+      }, data.access_token);
+    }
+
     alert("로그인 성공!");
-    navigate("/dashboard"); // 대시보드 페이지로 이동
+    navigate("/dashboard"); 
   } catch (err) {
     alert("로그인 실패: " + err.message);
   }
@@ -50,12 +94,12 @@ const handleSubmit = async (e) => {
           <h2 className="text-[30px] font-extrabold mb-8 text-left justify-center items-center ml-[100px] mt-[80px]">Login</h2>
           <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6 justify-center items-center ml-[50px]">
             <div>
-              <label className="block text-[#837A7A] text-[14px] w-[300px] h-[30px] mt-[28px]">이름</label>
+              <label className="block text-[#837A7A] text-[14px] w-[300px] h-[30px] mt-[28px]">이메일</label>
               <input
                 className="border border-[#3C66B8] rounded-full px-5 py-2 w-full h-[36px] focus:outline-none focus:ring-2 focus:ring-blue-300 text-lg"
-                type="name"
-                name="name"
-                value={form.name}
+                type="email"
+                name="email"
+                value={form.email}
                 onChange={handleChange}
               />
             </div>

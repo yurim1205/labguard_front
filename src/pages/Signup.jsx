@@ -1,12 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 import SignupBtn from "../components/button/signupBtn";
 
 function Signup() {
   const [form, setForm] = useState({
     name: '',
+    email: '',
     password: '',
     company_id: '',
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,21 +21,43 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // company_id를 정수로 변환
+      const formData = {
+        ...form,
+        company_id: parseInt(form.company_id) || 1  // 문자열을 정수로 변환, 실패하면 기본값 1
+      };
+  
       const response = await fetch("http://localhost:8000/api/user/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),  // form은 { name, password, company_id } 등
+        body: JSON.stringify(formData),  // 변환된 데이터 사용
+        credentials: "include"
       });
   
       if (!response.ok) {
         const errData = await response.json();
-        throw new Error(errData.detail || "회원가입 실패");
+        
+        // 특정 에러 메시지 처리
+        if (errData.detail === "Email already registered") {
+          throw new Error("이미 등록된 이메일입니다. 다른 이메일을 사용해주세요.");
+        } else if (errData.detail) {
+          throw new Error(errData.detail);
+        } else {
+          throw new Error("회원가입에 실패했습니다. 다시 시도해주세요.");
+        }
       }
   
+      // 회원가입 성공 시 사용자 정보를 store에 저장
+      useAuthStore.getState().login({
+        name: form.name,
+        email: form.email,
+        company_id: parseInt(form.company_id) || 1
+      }, null); // 회원가입 시에는 토큰이 없으므로 null
+  
       alert("회원가입 성공!");
-      navigate("/login") 
+      navigate("/dashboard") 
     } catch (error) {
       alert("회원가입 실패: " + error.message);
     }
@@ -50,6 +77,17 @@ function Signup() {
                 type="text"
                 name="name"
                 value={form.name}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <label className="block text-[#837A7A] text-[14px] w-[300px] h-[30px]">이메일</label>
+              <input
+                className="border border-[#3C66B8] rounded-full px-5 py-2 w-full h-[36px] focus:outline-none focus:ring-2 focus:ring-blue-300 text-lg"
+                type="email"
+                name="email"
+                value={form.email}
                 onChange={handleChange}
               />
             </div>
