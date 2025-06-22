@@ -54,7 +54,7 @@ function Signup() {
         name: form.name,
         email: form.email,
         company_id: parseInt(form.company_id) || 1
-      }, null); // 회원가입 시에는 토큰이 없으므로 null
+      }); // 회원가입 시에는 토큰이 없으므로 제거
   
       alert("회원가입 성공!");
       navigate("/dashboard") 
