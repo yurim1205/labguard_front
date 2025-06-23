@@ -31,8 +31,9 @@ function ReportMain() {
 
         {/* 내 실험 */}
         <section className="mt-[48px]">
-          <h2 className="text-[20px] font-bold mb-3 text-left font-[500]">여기 총 갯수 적기</h2>
-
+        <h2 className="text-[16px] font-bold mb-3 text-left">
+          총 {reports.length}개
+        </h2>
           <div className="overflow-x-auto">
             <table className="min-w-full table-auto border-collapse border border-gray-200">
               <thead className="bg-[#EDF0FA] text-left text-[#1C1C59]">
