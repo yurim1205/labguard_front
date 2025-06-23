@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import SignupBtn from "../components/button/signupBtn";
-import leftArrow from "../assets/img/leftArrow.png"
+import lefrArrow from "../assets/img/leftArrow.png"
 
 function Signup() {
   const [form, setForm] = useState({
@@ -65,13 +65,7 @@ function Signup() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#5D93E4] to-[#E2ECFF] gap-8 relative">
-      <img 
-        src={leftArrow} 
-        alt="leftArrow" 
-        className="w-[20px] h-[20px] absolute top-[20px] left-[20px] cursor-pointer" 
-        onClick={() => navigate("/login")}
-      />
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#5D93E4] to-[#E2ECFF] gap-8">
       <div className="w-[500px] h-[700px] rounded-[40px] shadow-md items-center justify-start bg-[#FFFFFF] shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]">
         <div className="bg-white rounded-[40px] shadow-xl px-10 py-12 w-full max-w-[400px] flex flex-col items-start">
           <h2 className="text-[30px] font-extrabold mb-8 text-left justify-center items-center ml-[100px] mt-[80px]">Sign Up</h2>
@@ -125,6 +119,7 @@ function Signup() {
               <SignupBtn>Sign Up</SignupBtn>
             </div>
           </form>
+
         </div>
       </div>
     </div>

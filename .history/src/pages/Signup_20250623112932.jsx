@@ -125,6 +125,7 @@ function Signup() {
               <SignupBtn>Sign Up</SignupBtn>
             </div>
           </form>
+
         </div>
       </div>
     </div>

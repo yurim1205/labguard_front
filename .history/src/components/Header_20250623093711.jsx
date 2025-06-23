@@ -1,13 +1,11 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore"; // 전역 상태관리 store
-import ArrowImg from "../assets/img/downArrow.png";
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
-  const user = useAuthStore((state) => state.user); // 사용자 정보 가져오기
 
   const handleLogout = async () => {
     try {
@@ -56,18 +54,11 @@ function Header() {
           ))}
         </nav>
 
-        {/* 오른쪽: 사용자 이름과 로그아웃 버튼 */}
-        <div className="flex-1 flex justify-end pr-[60px] items-center gap-4">
-          {user && (
-            <span className="text-[#1A237E] text-sm font-semibold">
-             <span className="font-bold">{user?.name || '사용자'}</span> 님
-            </span>
-          )}
-           <img src={ArrowImg} alt="화살표" className="w-[14px] h-[14px] mr-[10px]" />
-
+        {/* 오른쪽: 로그아웃 버튼 */}
+        <div className="flex-1 flex justify-end pr-[60px]">
           <button
             onClick={handleLogout}
-            className="text-[#1A237E] text-sm font-bold border border-[#1A237E] px-4 py-1 rounded-full hover:bg-[#1A237E] hover:text-white transition flex items-center gap-2"
+            className="text-[#1A237E] text-sm font-bold border border-[#1A237E] px-4 py-1 rounded-full hover:bg-[#1A237E] hover:text-white transition"
           >
             로그아웃
           </button>
