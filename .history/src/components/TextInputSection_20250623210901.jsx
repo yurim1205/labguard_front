@@ -11,8 +11,7 @@ const TextInputSection = ({ input, onInput, onSend, disabled }) => (
       disabled={disabled}
     />
     <button
-       className="bg-[#DFE9FB] hover:bg-[#4071c7] w-[50px] h-[52px] text-[#8B8A8A] mb-[4px]
-      font-medium py-3 rounded-sm transition text-[14px] border-none shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]"
+      className="h-[50px] px-4 py-2 bg-[#33308B] text-white rounded-lg font-semibold hover:bg-[#2a276f] disabled:bg-gray-400"
       onClick={onSend}
       disabled={disabled}
     >

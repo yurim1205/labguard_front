@@ -82,7 +82,7 @@ function ExperimentChat() {
       <Header />
       <div className="max-w-[1200px] mx-auto pt-10 pb-12">
         <h1 className="text-[2.3rem] font-black mb-[30px] text-left">
-          {experimentDetails.experiment_title}
+          {experimentDetails.experiment_name}
         </h1>
         <p className="text-[#7B87B8] text-base text-left mt-[-10px]">
           실험 중 음성 또는 텍스트로 로그를 남기거나 질문할 수 있습니다. <br />

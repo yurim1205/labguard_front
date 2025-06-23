@@ -11,7 +11,7 @@ import TextInputSection from '../../components/TextInputSection';
 function ExperimentChat() {
   const location = useLocation();
   const [experimentDetails, setExperimentDetails] = useState({
-    experiment_title: location.state?.experiment_title || '실험 제목 없음',
+    experiment_name: location.state?.experiment_name || '실험 제목 없음',
     manual: location.state?.manual || '매뉴얼 선택 안 됨',
   });
   const [messages, setMessages] = useState([
@@ -82,7 +82,7 @@ function ExperimentChat() {
       <Header />
       <div className="max-w-[1200px] mx-auto pt-10 pb-12">
         <h1 className="text-[2.3rem] font-black mb-[30px] text-left">
-          {experimentDetails.experiment_title}
+          {experimentDetails.experiment_name}
         </h1>
         <p className="text-[#7B87B8] text-base text-left mt-[-10px]">
           실험 중 음성 또는 텍스트로 로그를 남기거나 질문할 수 있습니다. <br />
@@ -93,7 +93,7 @@ function ExperimentChat() {
         <div className="bg-[#f8f9fa] p-6 rounded-xl shadow-sm mb-10">
         <section
           ref={chatContainerRef}
-          className="bg-[#D8DDFF] rounded-lg shadow-md p-4 h-[550px] overflow-y-auto space-y-4"
+          className="bg-[#D8DDFF] rounded-lg shadow-md p-4 h-[600px] overflow-y-auto space-y-4"
         >
           {messages.map((msg, index) => (
             <div

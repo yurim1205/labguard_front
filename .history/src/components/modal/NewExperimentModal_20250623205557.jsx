@@ -10,7 +10,7 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
 
   const handleSubmit = () => {
     if (experiment_title.trim()) {
-      navigate('/ExperimentChat', {
+      navigate('/Experiment/ExperimentChat', {
         state: {
           experiment_title,
           manual: selectedManual,

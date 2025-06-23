@@ -1,24 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import ExperimentStartBtn from '../button/experimentStartBtn';
 
 const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
-  const [experiment_title, setExperimentTitle] = useState(''); // 실험 제목 상태
+  const [experiment_name, setExperimentName] = useState(''); // 실험 제목 상태
   const [selectedManual, setSelectedManual] = useState(''); // 매뉴얼 선택 상태
 
-  const navigate = useNavigate();
-
   const handleSubmit = () => {
-    if (experiment_title.trim()) {
-      navigate('/ExperimentChat', {
-        state: {
-          experiment_title,
-          manual: selectedManual,
-        },
-      });
+    if (experiment_name.trim()) {
+      onTitleSubmit({ experiment_name, manual: selectedManual }); // 제목과 선택한 매뉴얼 전달
       onClose(); // 모달 닫기
     }
   };
+
   return (
     <div className="fixed inset-0 z-50">
       {/* 배경 */}
@@ -43,8 +36,8 @@ const NewExperimentModal = ({ onClose, onTitleSubmit, manuals = [] }) => {
           <input
             type="text"
             placeholder="실험 제목을 입력해주세요."
-            value={experiment_title}
-            onChange={(e) => setExperimentTitle(e.target.value)}
+            value={experiment_name}
+            onChange={(e) => setExperimentName(e.target.value)}
             className="w-full border border-gray-400 rounded px-4 py-2 text-sm h-[28px]"
           />
         </div>
