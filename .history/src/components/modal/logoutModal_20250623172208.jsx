@@ -51,7 +51,7 @@ const LogoutModal = ({ onLogout }) => {
   };
 
   return (
-    <div className="w-[150px] h-[120px] bg-[#FFFFFF] mt-[30px] rounded-[30px] p-8 flex flex-col items-center justify-between shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]">
+    <div className="w-[150px] h-[120px] bg-[#FFFFFF] mt-[10px] rounded-[30px] p-8 flex flex-col items-center justify-between shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]">
     <div className="w-[150px] h-[120px] rounded-lg bg-gray-100 flex flex-col justify-center items-center shadow-md">
       <button
         onClick={onLogout}

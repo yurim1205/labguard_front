@@ -51,23 +51,20 @@ const LogoutModal = ({ onLogout }) => {
   };
 
   return (
-    <div className="w-[150px] h-[120px] bg-[#FFFFFF] mt-[30px] rounded-[30px] p-8 flex flex-col items-center justify-between shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]">
-    <div className="w-[150px] h-[120px] rounded-lg bg-gray-100 flex flex-col justify-center items-center shadow-md">
+    <div className="bg-[#5989D8] hover:bg-[#4071c7] w-[300px] h-[48px] mt-[80px] text-[#ffffff] 
+      font-medium py-3 rounded-full transition text-[16px] border-none shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]">
       <button
         onClick={onLogout}
-        className="bg-[#DFE9FB] hover:bg-[#4071c7] w-[120px] h-[36px] text-[#8B8A8A] mb-[4px]
-      font-medium py-3 rounded-full transition text-[14px] border-none shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]"
+        className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
       >
         로그아웃
       </button>
       <button 
         onClick={handleWithdraw}
-        className="bg-[#8DAEEC] hover:bg-[#4071c7] w-[120px] h-[36px] text-[#ffffff] 
-      font-medium py-3 rounded-full transition text-[14px] border-none shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]"
+        className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
       >
         탈퇴하기
       </button>
-    </div>
     </div>
   );
 };

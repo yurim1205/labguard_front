@@ -58,9 +58,10 @@ function Header() {
           ))}
         </nav>
 
+        {/* 오른쪽: 사용자 이름과 로그아웃 버튼 */}
         <div className="flex-1 flex justify-end pr-[60px] items-center gap-4 relative">
           {user && (
-            <span className="text-[#1A237E] text-sm font-semibold mr-[12px]">
+            <span className="text-[#1A237E] text-sm font-semibold">
              <span className="font-bold">{user?.name || '사용자'}</span> 님
             </span>
           )}

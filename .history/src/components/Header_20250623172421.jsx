@@ -60,7 +60,7 @@ function Header() {
 
         <div className="flex-1 flex justify-end pr-[60px] items-center gap-4 relative">
           {user && (
-            <span className="text-[#1A237E] text-sm font-semibold mr-[12px]">
+            <span className="text-[#1A237E] text-sm font-semibold mr-[10px]">
              <span className="font-bold">{user?.name || '사용자'}</span> 님
             </span>
           )}
