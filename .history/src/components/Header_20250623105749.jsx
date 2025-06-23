@@ -63,7 +63,7 @@ function Header() {
              <span className="font-bold">{user?.name || '사용자'}</span> 님
             </span>
           )}
-           <img src={ArrowImg} alt="화살표" className="w-[14px] h-[14px] mr-[10px]" />
+           <img src={ArrowImg} alt="화살표" className="w-[14px] h-[14px]" />
 
           <button
             onClick={handleLogout}

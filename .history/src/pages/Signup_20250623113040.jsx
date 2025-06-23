@@ -74,7 +74,7 @@ function Signup() {
       />
       <div className="w-[500px] h-[700px] rounded-[40px] shadow-md items-center justify-start bg-[#FFFFFF] shadow-[0_12px_24px_0_rgba(128,128,128,0.35)]">
         <div className="bg-white rounded-[40px] shadow-xl px-10 py-12 w-full max-w-[400px] flex flex-col items-start">
-          <h2 className="text-[30px] font-extrabold mb-8 text-left justify-center items-center ml-[100px] mt-[80px]">Sign Up</h2>
+          <h2 className="text-[30px] font-extrabold mb-8 text-left justify-center items-centermt-[80px]">Sign Up</h2>
           
           <form onSubmit={handleSubmit} className="items-center w-full flex flex-col justify-center ml-[50px] space-y-[12px]">
             <div>
