@@ -35,7 +35,7 @@ function ManualRead() {
         console.log('📖 매뉴얼 데이터 로드 시작:', manualId);
         
         // 매뉴얼 정보 가져오기
-        const manualResponse = await fetch(`api/manuals/${manualId}`, {
+        const manualResponse = await fetch(`http://localhost:8000/manuals/${manualId}`, {
           method: 'GET',
           credentials: 'include',
           headers: {
