@@ -14,7 +14,7 @@ import ExperimentChat from './pages/Experiment/ExperimentChat';
 import ExperimentContinue from './pages/Experiment/ExperimentContinue';
 import ReportMain from './pages/Report/ReportMain';
 import ReportRead from './pages/Report/ReportRead';
-import AuthLoader from "./components/AuthLoader";
+
 
 function App() {
   const { login, token } = useAuthStore();
@@ -59,7 +59,7 @@ function App() {
 
   return (
     <Router>
-      <AuthLoader />
+        <AuthLoader />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
