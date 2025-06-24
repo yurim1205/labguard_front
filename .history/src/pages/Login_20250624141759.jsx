@@ -4,8 +4,6 @@ import LoginBtn from "../components/button/loginBtn";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { z } from "zod";
-import { fetchWithTokenRetry } from "../utils/fetchWithAuth";
-
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -73,11 +71,12 @@ function Login() {
       console.log("Login response:", data);
 
       try {
-        const userResponse = await fetchWithTokenRetry("/api/user/me", {
+        const userResponse = await fetch("/api/user/me", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
         });
-        
+
         if (userResponse.ok) {
           const userData = await userResponse.json();
           useAuthStore.getState().login({

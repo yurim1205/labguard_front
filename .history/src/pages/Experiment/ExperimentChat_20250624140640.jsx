@@ -132,31 +132,7 @@ function ExperimentChat() {
     }
   };
 
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/user/me', {
-        method: 'GET',
-        credentials: 'include'
-      });
-      
-      if (response.status === 401) {
-        console.error('사용자 인증 실패');
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        navigate('/login');
-        return false;
-      }
-      
-      return response.ok;
-    } catch (error) {
-      console.error('인증 상태 확인 에러:', error);
-      return false;
-    }
-  };
-
   useEffect(() => {
-    // 페이지 로드 시 인증 상태 확인
-    checkAuthStatus();
-    
     return () => {
       if (socketRef.current) {
         socketRef.current.close();

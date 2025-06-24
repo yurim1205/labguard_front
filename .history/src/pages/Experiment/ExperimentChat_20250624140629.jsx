@@ -57,17 +57,9 @@ function ExperimentChat() {
       setStatusText('연결 오류 - 서버 상태를 확인해주세요');
     };
 
-    socketRef.current.onclose = (event) => {
-      console.log('WebSocket 연결 종료:', event.code, event.reason);
-      
-      // 인증 실패로 인한 연결 종료 처리
-      if (event.code === 1008 || event.code === 1011) {
-        console.error('WebSocket 인증 실패');
-        alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
-        navigate('/login');
-      } else {
-        setStatusText('연결이 종료되었습니다');
-      }
+    socketRef.current.onclose = () => {
+      console.log('WebSocket 연결 종료');
+      setStatusText('연결이 종료되었습니다');
     };
   };
 
@@ -132,31 +124,7 @@ function ExperimentChat() {
     }
   };
 
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/user/me', {
-        method: 'GET',
-        credentials: 'include'
-      });
-      
-      if (response.status === 401) {
-        console.error('사용자 인증 실패');
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        navigate('/login');
-        return false;
-      }
-      
-      return response.ok;
-    } catch (error) {
-      console.error('인증 상태 확인 에러:', error);
-      return false;
-    }
-  };
-
   useEffect(() => {
-    // 페이지 로드 시 인증 상태 확인
-    checkAuthStatus();
-    
     return () => {
       if (socketRef.current) {
         socketRef.current.close();

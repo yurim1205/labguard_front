@@ -4,8 +4,6 @@ import LoginBtn from "../components/button/loginBtn";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { z } from "zod";
-import { fetchWithTokenRetry } from "../utils/fetchWithAuth";
-
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -61,23 +59,46 @@ function Login() {
       });
 
       if (!response.ok) {
-        const errData = await response.json();
-        if (response.status === 401) {
-          throw new Error("회원정보가 없습니다. 회원가입을 먼저 진행해주세요.");
-        } else {
-          throw new Error(errData.detail || "로그인 실패");
+        let errorMessage = "로그인 실패";
+        
+        try {
+          const errData = await response.json();
+          console.error('로그인 에러 상세:', errData);
+          
+          if (response.status === 401) {
+            // 더 구체적인 401 에러 메시지
+            if (errData.detail && errData.detail.includes('password')) {
+              errorMessage = "비밀번호가 틀렸습니다. 다시 확인해주세요.";
+            } else if (errData.detail && errData.detail.includes('email')) {
+              errorMessage = "등록되지 않은 이메일입니다. 회원가입을 먼저 진행해주세요.";
+            } else {
+              errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다.\n\n등록된 계정이라면 비밀번호를 확인해주세요.\n등록되지 않은 계정이라면 회원가입을 진행해주세요.";
+            }
+          } else if (response.status === 422) {
+            errorMessage = "입력 정보가 올바르지 않습니다. 이메일과 비밀번호를 확인해주세요.";
+          } else {
+            errorMessage = errData.detail || errData.message || errorMessage;
+          }
+        } catch (jsonError) {
+          console.error('에러 응답 파싱 실패:', jsonError);
+          if (response.status === 401) {
+            errorMessage = "로그인 정보가 올바르지 않습니다.\n\n• 이메일과 비밀번호를 다시 확인해주세요\n• 계정이 없다면 회원가입을 진행해주세요";
+          }
         }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
       console.log("Login response:", data);
 
       try {
-        const userResponse = await fetchWithTokenRetry("/api/user/me", {
+        const userResponse = await fetch("/api/user/me", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
         });
-        
+
         if (userResponse.ok) {
           const userData = await userResponse.json();
           useAuthStore.getState().login({
