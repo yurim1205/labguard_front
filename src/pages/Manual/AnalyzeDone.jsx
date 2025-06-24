@@ -31,7 +31,7 @@ function AnalyzeDone() {
       try {
         console.log('청크 데이터 요청 시작...', manual_id);
         
-        const response = await fetch(`http://localhost:8000/manual/chunks?manual_id=${manual_id}`, {
+        const response = await fetch(`/api/manual/chunks?manual_id=${manual_id}`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -86,7 +86,7 @@ function AnalyzeDone() {
     try {
       console.log('🗑️ 매뉴얼 등록 취소 요청:', manual_id);
       
-      const response = await fetch(`http://localhost:8000/manuals/${manual_id}`, {
+      const response = await fetch(`/api/manuals/${manual_id}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {

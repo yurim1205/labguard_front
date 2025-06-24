@@ -10,8 +10,8 @@ function ManualRead() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // 전달받은 manualId
-  const manualId = location.state?.manualId;
+  // 전달받은 manual_id
+  const manual_id = location.state?.manual_id;
   
   // 매뉴얼 데이터 상태
   const [manualData, setManualData] = useState(null);
@@ -21,7 +21,7 @@ function ManualRead() {
 
   // 매뉴얼 데이터 불러오기
   useEffect(() => {
-    if (!manualId) {
+    if (!manual_id) {
       console.error('매뉴얼 ID가 없습니다.');
       navigate('/manual');
       return;
@@ -32,10 +32,10 @@ function ManualRead() {
       setError(null);
 
       try {
-        console.log('📖 매뉴얼 데이터 로드 시작:', manualId);
+        console.log('📖 매뉴얼 데이터 로드 시작:', manual_id);
         
         // 매뉴얼 정보 가져오기
-        const manualResponse = await fetch(`api/manuals/${manualId}`, {
+        const manualResponse = await fetch(`/api/manuals/${manual_id}`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -52,7 +52,7 @@ function ManualRead() {
         setManualData(manual);
 
         // 청크 데이터 가져오기
-        const chunksResponse = await fetch(`http://localhost:8000/manual/chunks?manual_id=${manualId}`, {
+        const chunksResponse = await fetch(`/api/manual/chunks?manual_id=${manual_id}`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -77,7 +77,7 @@ function ManualRead() {
     };
 
     fetchManualData();
-  }, [manualId, navigate]);
+  }, [manual_id, navigate]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -95,9 +95,9 @@ function ManualRead() {
     if (!confirmed) return;
 
     try {
-      console.log('🗑️ 매뉴얼 삭제 요청:', manualId);
+      console.log('🗑️ 매뉴얼 삭제 요청:', manual_id);
       
-      const response = await fetch(`http://localhost:8000/manuals/${manualId}`, {
+      const response = await fetch(`/api/manuals/${manual_id}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -145,35 +145,17 @@ function ManualRead() {
 
   // 위험도 분석 결과 버튼 클릭 핸들러
   const handleDangerResult = () => {
-    console.log('📊 위험도 분석 결과 버튼 클릭 - 매뉴얼 ID:', manualId);
-    // RiskAnalyzeResult 페이지로 이동하면서 manualId 전달
+    console.log('📊 위험도 분석 결과 버튼 클릭 - 매뉴얼 ID:', manual_id);
+    // RiskAnalyzeResult 페이지로 이동하면서 manual_id 전달
     navigate('/RiskAnalyzeResult', { 
       state: { 
-        manualId: manualId,
+        manual_id: manual_id,
         manualData: manualData 
       } 
     });
   };
 
-  // manualId가 없는 경우
-  if (!manualId) {
-    return (
-      <>
-        <Header />
-        <div className="max-w-[1200px] mx-auto pt-10 pb-12">
-          <div className="text-center">
-            <p className="text-red-600 text-lg mb-4">매뉴얼 ID가 없습니다.</p>
-            <button 
-              onClick={() => navigate('/manual')}
-              className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-            >
-              매뉴얼 목록으로 돌아가기
-            </button>
-          </div>
-        </div>
-      </>
-    );
-  }
+
 
   return (
     <>

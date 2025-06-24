@@ -97,7 +97,7 @@ function ManualUpload() {
     console.log('📖 매뉴얼 클릭:', manual_id);
     navigate('/ManualRead', { 
       state: { 
-        manualId: manual_id 
+        manual_id: manual_id 
       } 
     });
   };
