@@ -27,20 +27,17 @@ function ExperimentChat() {
   const [audioUrl, setAudioUrl] = useState('');
   const chatContainerRef = useRef(null);
   const socketRef = useRef(null);
-  const [isTyping, setIsTyping] = useState(false);
-
 
   useEffect(() => {
+    // WebSocket 연결 (텍스트 전송용)
     socketRef.current = new WebSocket('ws://localhost:8000/ws/agent-chat');
-  
     socketRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      setIsTyping(false); // ✅ 응답 도착 시 typing 종료
       setMessages((prev) => [...prev, { sender: 'bot', text: data.response }]);
     };
-  
+
     return () => socketRef.current?.close();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -54,9 +51,7 @@ function ExperimentChat() {
     setMessages((prev) => [...prev, newMsg]);
     socketRef.current.send(JSON.stringify({ message: input }));
     setInput('');
-    setIsTyping(true); // ✅ 응답 기다리는 중
   };
-  
 
   const handleMicClick = () => {
     setIsRecording((prev) => !prev);
@@ -102,7 +97,7 @@ function ExperimentChat() {
           ref={chatContainerRef}
           className="bg-[#D8DDFF] rounded-lg shadow-md p-4 h-[550px] overflow-y-auto space-y-4"
         >
-       {messages.map((msg, index) => (
+        {messages.map((msg, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 10 }}
@@ -111,27 +106,14 @@ function ExperimentChat() {
             className={`w-full flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[70%] px-4 py-3 rounded-[20px] text-sm break-words shadow-sm
-                ${msg.sender === 'user'
-                  ? 'bg-[#565991] text-white rounded-br-none'
-                  : 'bg-white text-black rounded-bl-none border border-gray-200'}`}
+              className={`inline-block px-4 py-3 rounded-[20px] text-sm break-words
+                ${msg.sender === 'user' ? 'bg-[#565991] text-right text-white' : 'bg-[#F2F2F2] text-left'}
+                max-w-[70%]`}
             >
               {msg.text}
             </div>
           </motion.div>
         ))}
-        {isTyping && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="w-full flex justify-start"
-          >
-            <div className="bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded-[20px] max-w-[40%] animate-pulse">
-              입력 중...
-            </div>
-          </motion.div>
-        )}
         </section>
         </div>
 

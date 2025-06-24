@@ -54,9 +54,7 @@ function ExperimentChat() {
     setMessages((prev) => [...prev, newMsg]);
     socketRef.current.send(JSON.stringify({ message: input }));
     setInput('');
-    setIsTyping(true); // ✅ 응답 기다리는 중
   };
-  
 
   const handleMicClick = () => {
     setIsRecording((prev) => !prev);
@@ -120,18 +118,6 @@ function ExperimentChat() {
             </div>
           </motion.div>
         ))}
-        {isTyping && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="w-full flex justify-start"
-          >
-            <div className="bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded-[20px] max-w-[40%] animate-pulse">
-              입력 중...
-            </div>
-          </motion.div>
-        )}
         </section>
         </div>
 

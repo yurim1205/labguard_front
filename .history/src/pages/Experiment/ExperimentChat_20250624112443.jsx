@@ -31,16 +31,15 @@ function ExperimentChat() {
 
 
   useEffect(() => {
+    // WebSocket 연결 (텍스트 전송용)
     socketRef.current = new WebSocket('ws://localhost:8000/ws/agent-chat');
-  
     socketRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      setIsTyping(false); // ✅ 응답 도착 시 typing 종료
       setMessages((prev) => [...prev, { sender: 'bot', text: data.response }]);
     };
-  
+
     return () => socketRef.current?.close();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -54,9 +53,7 @@ function ExperimentChat() {
     setMessages((prev) => [...prev, newMsg]);
     socketRef.current.send(JSON.stringify({ message: input }));
     setInput('');
-    setIsTyping(true); // ✅ 응답 기다리는 중
   };
-  
 
   const handleMicClick = () => {
     setIsRecording((prev) => !prev);
@@ -120,18 +117,6 @@ function ExperimentChat() {
             </div>
           </motion.div>
         ))}
-        {isTyping && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="w-full flex justify-start"
-          >
-            <div className="bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded-[20px] max-w-[40%] animate-pulse">
-              입력 중...
-            </div>
-          </motion.div>
-        )}
         </section>
         </div>
 
