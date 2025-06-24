@@ -10,7 +10,7 @@ import ManualRead from './pages/Manual/ManualRead';
 import RiskAnalyzeResult from './pages/Manual/RiskAnalyzeResult';
 import ExperimentMain from './pages/Experiment/ExperimentMain';
 import ExperimentChat from './pages/Experiment/ExperimentChat';
-import ReportMake from './pages/Report/ReportMake';
+// import ReportMake from './pages/Report/ReportMake';
 import ExperimentContinue from './pages/Experiment/ExperimentContinue';
 import ReportMain from './pages/Report/ReportMain';
 import ReportRead from './pages/Report/ReportRead';
@@ -69,7 +69,7 @@ function App() {
         <Route path="/RiskAnalyzeResult" element={<RiskAnalyzeResult />} />
         <Route path="/ExperimentMain" element={<ExperimentMain />} />
         <Route path="/ExperimentChat" element={<ExperimentChat />} />
-        <Route path="/ReportMake" element={<ReportMake />} />
+        {/* <Route path="/ReportMake" element={<ReportMake />} /> */}
         <Route path="/ExperimentContinue" element={<ExperimentContinue />} />
         <Route path="/ReportMain" element={<ReportMain />} />
         <Route path="/ReportRead" element={<ReportRead />} />

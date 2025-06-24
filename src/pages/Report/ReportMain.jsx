@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 
+// 더미 리포트 목록 데이터 - 실제 API로 교체 예정
 const reportList = [
   {
     id: 2,
@@ -16,7 +18,13 @@ const reportList = [
 
 function ReportMain() {
   const fileInputRef = useRef();
+  const navigate = useNavigate(); // 페이지 이동을 위한 navigate 함수
   const [reports, setReports] = useState(reportList);
+
+  // 리포트 제목 클릭 시 상세 페이지로 이동하는 함수
+  const handleReportClick = (reportId) => {
+    navigate(`/ReportRead/${reportId}`);
+  };
 
   return (
     <>
@@ -29,13 +37,14 @@ function ReportMain() {
         PDF 파일 형식으로 저장할 수 있습니다.
         </p>
 
-        {/* 내 실험 */}
+        {/* 리포트 목록 테이블 */}
         <section className="mt-[48px]">
         <h2 className="text-[16px] font-bold mb-3 text-left">
           총 {reports.length}개
         </h2>
           <div className="overflow-x-auto">
             <table className="min-w-full table-auto border-collapse border border-gray-200">
+              {/* 테이블 헤더 */}
               <thead className="bg-[#EDF0FA] text-left text-[#1C1C59]">
                 <tr>
                   <th className="px-6 py-3 text-sm font-bold border-b border-gray-200 mr-[50px]">No</th>
@@ -43,11 +52,15 @@ function ReportMain() {
                   <th className="px-6 py-3 text-sm font-bold border-b border-gray-200">생성일시</th>
                 </tr>
               </thead>
+              {/* 테이블 본문 - 리포트 목록 출력 */}
               <tbody className="text-[#1C1C59]">
                 {reports.map((report) => (
                   <tr key={report.id} className="hover:bg-gray-50 cursor-pointer">
                     <td className="px-6 py-3 border-b border-gray-200">{report.id}</td>
-                    <td className="px-6 py-3 border-b border-gray-200 underline text-blue-800">
+                    <td 
+                      className="px-6 py-3 border-b border-gray-200 underline text-blue-800 cursor-pointer hover:text-blue-600"
+                      onClick={() => handleReportClick(report.id)} // 제목 클릭 시 상세 페이지로 이동
+                    >
                       {report.title}
                     </td>
                     <td className="px-6 py-3 border-b border-gray-200 text-[#19234E]">{report.created_at}</td>
