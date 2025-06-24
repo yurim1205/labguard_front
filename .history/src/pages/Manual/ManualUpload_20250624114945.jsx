@@ -136,20 +136,10 @@ function ManualUpload() {
       if (!uploadResponse.ok) {
         let errorMessage = `업로드 실패: HTTP ${uploadResponse.status}`;
         
-        // 응답 텍스트 전체를 먼저 읽어 보기
-        let responseText = '';
         try {
-          responseText = await uploadResponse.text();
-          console.error('서버 에러 응답 원문:', responseText);
-        } catch (textError) {
-          console.error('응답 텍스트 읽기 실패:', textError);
-        }
-        
-        try {
-          // JSON 파싱 시도
-          const errorData = responseText ? JSON.parse(responseText) : {};
+          const errorData = await uploadResponse.json();
           console.error('업로드 에러 상세:', errorData);
-          errorMessage = errorData.detail || errorData.message || errorMessage;
+          errorMessage = errorData.detail || errorMessage;
           
           // 401 인증 오류 처리
           if (uploadResponse.status === 401) {
@@ -158,24 +148,13 @@ function ManualUpload() {
             return;
           }
         } catch (jsonError) {
-          console.error('에러 응답 JSON 파싱 실패:', jsonError);
-          
-          // 상태 코드별 에러 메시지 개선
+          console.error('에러 응답 파싱 실패:', jsonError);
           if (uploadResponse.status === 500) {
-            errorMessage = '서버 내부 오류가 발생했습니다.\n\n가능한 원인:\n• 데이터베이스 연결 문제\n• 파일 처리 오류\n• 서버 리소스 부족\n\n시스템 관리자에게 문의해주세요.';
-            console.error('500 에러 - 서버 응답:', responseText);
+            errorMessage = '서버 내부 오류가 발생했습니다. 데이터베이스 연결을 확인해주세요.';
           } else if (uploadResponse.status === 401) {
             alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
             navigate('/login');
             return;
-          } else if (uploadResponse.status === 413) {
-            errorMessage = '파일 크기가 너무 큽니다. 30MB 이하의 파일을 업로드해주세요.';
-          } else if (uploadResponse.status === 415) {
-            errorMessage = '지원하지 않는 파일 형식입니다. PDF 파일만 업로드 가능합니다.';
-          } else if (uploadResponse.status >= 500) {
-            errorMessage = `서버 오류가 발생했습니다 (${uploadResponse.status}). 잠시 후 다시 시도해주세요.`;
-          } else if (uploadResponse.status >= 400) {
-            errorMessage = `요청 오류가 발생했습니다 (${uploadResponse.status}). 파일과 입력값을 확인해주세요.`;
           }
         }
         
