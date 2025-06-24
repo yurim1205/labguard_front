@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Header from '../../components/Header';
 import ChatInput from '../../components/ChatInput';
 import VoiceControls from '../../components/VoiceControls';
@@ -12,7 +12,6 @@ import { motion } from 'framer-motion';
 
 function ExperimentChat() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [experimentDetails, setExperimentDetails] = useState({
     experiment_title: location.state?.experiment_title || '실험 제목 없음',
     manual: location.state?.manual || '매뉴얼 선택 안 됨',
@@ -57,17 +56,9 @@ function ExperimentChat() {
       setStatusText('연결 오류 - 서버 상태를 확인해주세요');
     };
 
-    socketRef.current.onclose = (event) => {
-      console.log('WebSocket 연결 종료:', event.code, event.reason);
-      
-      // 인증 실패로 인한 연결 종료 처리
-      if (event.code === 1008 || event.code === 1011) {
-        console.error('WebSocket 인증 실패');
-        alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
-        navigate('/login');
-      } else {
-        setStatusText('연결이 종료되었습니다');
-      }
+    socketRef.current.onclose = () => {
+      console.log('WebSocket 연결 종료');
+      setStatusText('연결이 종료되었습니다');
     };
   };
 
@@ -93,21 +84,13 @@ function ExperimentChat() {
         console.log('음성 채팅 연결 성공:', data);
         setStatusText('음성 모드 활성화 - 마이크 버튼을 눌러 녹음하세요');
         setMessages((prev) => [...prev, { sender: 'bot', text: '음성 모드가 활성화되었습니다. 마이크 버튼을 눌러서 말씀해주세요! 🎤' }]);
-      } else if (response.status === 401) {
-        console.error('음성 채팅 인증 실패 - 로그인 필요');
-        alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
-        navigate('/login');
       } else {
         console.error('음성 채팅 연결 실패:', response.status, response.statusText);
         setStatusText('음성 모드 연결 실패 - 서버 상태를 확인해주세요');
       }
     } catch (error) {
       console.error('음성 채팅 연결 에러:', error);
-      if (error.message === 'Failed to fetch') {
-        setStatusText('서버에 연결할 수 없습니다 - 백엔드 서버를 확인해주세요');
-      } else {
-        setStatusText('음성 모드 연결 에러 - 네트워크를 확인해주세요');
-      }
+      setStatusText('음성 모드 연결 에러 - 네트워크를 확인해주세요');
     }
   };
 
@@ -132,31 +115,7 @@ function ExperimentChat() {
     }
   };
 
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/user/me', {
-        method: 'GET',
-        credentials: 'include'
-      });
-      
-      if (response.status === 401) {
-        console.error('사용자 인증 실패');
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        navigate('/login');
-        return false;
-      }
-      
-      return response.ok;
-    } catch (error) {
-      console.error('인증 상태 확인 에러:', error);
-      return false;
-    }
-  };
-
   useEffect(() => {
-    // 페이지 로드 시 인증 상태 확인
-    checkAuthStatus();
-    
     return () => {
       if (socketRef.current) {
         socketRef.current.close();
@@ -228,10 +187,6 @@ function ExperimentChat() {
         
         setStatusText('음성 처리 완료');
         setAudioBlob(null); // 전송 후 오디오 블롭 초기화
-      } else if (response.status === 401) {
-        console.error('음성 처리 인증 실패 - 로그인 필요');
-        alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
-        navigate('/login');
       } else {
         console.error('음성 처리 실패:', response.status, response.statusText);
         setStatusText('음성 처리 실패 - 다시 시도해주세요');

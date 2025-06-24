@@ -73,11 +73,12 @@ function Login() {
       console.log("Login response:", data);
 
       try {
-        const userResponse = await fetchWithTokenRetry("/api/user/me", {
+        const userResponse = await fetch("/api/user/me", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
         });
-        
+
         if (userResponse.ok) {
           const userData = await userResponse.json();
           useAuthStore.getState().login({
