@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Header from '../../components/Header';
 import ChatInput from '../../components/ChatInput';
 import VoiceControls from '../../components/VoiceControls';
@@ -12,7 +12,6 @@ import { motion } from 'framer-motion';
 
 function ExperimentChat() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [experimentDetails, setExperimentDetails] = useState({
     experiment_title: location.state?.experiment_title || '실험 제목 없음',
     manual: location.state?.manual || '매뉴얼 선택 안 됨',
@@ -57,106 +56,13 @@ function ExperimentChat() {
       setStatusText('연결 오류 - 서버 상태를 확인해주세요');
     };
 
-    socketRef.current.onclose = (event) => {
-      console.log('WebSocket 연결 종료:', event.code, event.reason);
-      
-      // 인증 실패로 인한 연결 종료 처리
-      if (event.code === 1008 || event.code === 1011) {
-        console.error('WebSocket 인증 실패');
-        alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
-        navigate('/login');
-      } else {
-        setStatusText('연결이 종료되었습니다');
-      }
+    socketRef.current.onclose = () => {
+      console.log('WebSocket 연결 종료');
+      setStatusText('연결이 종료되었습니다');
     };
   };
 
-  const connectVoiceChat = async () => {
-    try {
-      console.log('음성 채팅 연결 시도 중...');
-      setStatusText('음성 모드 활성화 중...');
-      
-      const response = await fetch('/api/web-voice/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          action: 'connect',
-          message: '음성 모드 활성화'
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('음성 채팅 연결 성공:', data);
-        setStatusText('음성 모드 활성화 - 마이크 버튼을 눌러 녹음하세요');
-        setMessages((prev) => [...prev, { sender: 'bot', text: '음성 모드가 활성화되었습니다. 마이크 버튼을 눌러서 말씀해주세요! 🎤' }]);
-      } else if (response.status === 401) {
-        console.error('음성 채팅 인증 실패 - 로그인 필요');
-        alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
-        navigate('/login');
-      } else {
-        console.error('음성 채팅 연결 실패:', response.status, response.statusText);
-        setStatusText('음성 모드 연결 실패 - 서버 상태를 확인해주세요');
-      }
-    } catch (error) {
-      console.error('음성 채팅 연결 에러:', error);
-      if (error.message === 'Failed to fetch') {
-        setStatusText('서버에 연결할 수 없습니다 - 백엔드 서버를 확인해주세요');
-      } else {
-        setStatusText('음성 모드 연결 에러 - 네트워크를 확인해주세요');
-      }
-    }
-  };
-
-  const handleExperimentEnd = () => {
-    const confirmEnd = window.confirm(
-      '실험을 종료하시겠습니까?\n\n종료하면 현재까지의 채팅 내용이 실험 로그로 저장됩니다.'
-    );
-    
-    if (confirmEnd) {
-      console.log('실험 종료 - 채팅 로그:', messages);
-      
-      // WebSocket 연결 종료
-      if (socketRef.current) {
-        socketRef.current.close();
-      }
-      
-      // 실험 결과 페이지로 이동하거나 메인 페이지로 돌아가기
-      alert('실험이 종료되었습니다. 채팅 로그가 저장되었습니다.');
-      
-      // 실험 메인 페이지로 이동
-      window.location.href = '/experiment';
-    }
-  };
-
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/user/me', {
-        method: 'GET',
-        credentials: 'include'
-      });
-      
-      if (response.status === 401) {
-        console.error('사용자 인증 실패');
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        navigate('/login');
-        return false;
-      }
-      
-      return response.ok;
-    } catch (error) {
-      console.error('인증 상태 확인 에러:', error);
-      return false;
-    }
-  };
-
   useEffect(() => {
-    // 페이지 로드 시 인증 상태 확인
-    checkAuthStatus();
-    
     return () => {
       if (socketRef.current) {
         socketRef.current.close();
@@ -172,13 +78,6 @@ function ExperimentChat() {
 
   const handleSend = () => {
     if (!input.trim()) return;
-    
-    // WebSocket 연결 확인
-    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
-      setStatusText('연결되지 않음 - 텍스트 버튼을 클릭하여 연결하세요');
-      return;
-    }
-    
     const newMsg = { sender: 'user', text: input };
     setMessages((prev) => [...prev, newMsg]);
     socketRef.current.send(JSON.stringify({ message: input }));
@@ -193,55 +92,22 @@ function ExperimentChat() {
   };
 
   const handleVoiceSubmit = async () => {
-    if (!audioBlob) {
-      setStatusText('녹음된 음성이 없습니다 - 마이크 버튼을 눌러 녹음하세요');
-      return;
-    }
-    
-    try {
-      console.log('음성 파일 전송 중...');
-      setStatusText('음성 처리 중...');
-      setIsTyping(true);
-      
-      const formData = new FormData();
-      formData.append('file', audioBlob, 'audio.wav');
+    if (!audioBlob) return;
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'audio.wav');
 
-      const response = await fetch('/api/web-voice/chat', {
-        method: 'POST',
-        credentials: 'include',
-        body: formData,
-      });
+    const res = await fetch('api/web-voice/chat', {
+      method: 'POST',
+      body: formData,
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('음성 응답 수신:', data);
-        
-        setMessages((prev) => [
-          ...prev,
-          { sender: 'user', text: '[음성 입력]' },
-          { sender: 'bot', text: data.response || '음성이 처리되었습니다.' },
-        ]);
-        
-        if (data.audio_url) {
-          setAudioUrl(data.audio_url);
-        }
-        
-        setStatusText('음성 처리 완료');
-        setAudioBlob(null); // 전송 후 오디오 블롭 초기화
-      } else if (response.status === 401) {
-        console.error('음성 처리 인증 실패 - 로그인 필요');
-        alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
-        navigate('/login');
-      } else {
-        console.error('음성 처리 실패:', response.status, response.statusText);
-        setStatusText('음성 처리 실패 - 다시 시도해주세요');
-      }
-    } catch (error) {
-      console.error('음성 전송 에러:', error);
-      setStatusText('음성 전송 실패 - 네트워크를 확인해주세요');
-    } finally {
-      setIsTyping(false);
-    }
+    const data = await res.json();
+    setMessages((prev) => [
+      ...prev,
+      { sender: 'user', text: '[음성 입력]' },
+      { sender: 'bot', text: data.response },
+    ]);
+    setAudioUrl(data.audio_url); // 만약 base64로 올 경우 변환 필요
   };
 
   const handleInputChange = (e) => setInput(e.target.value);
@@ -298,13 +164,7 @@ function ExperimentChat() {
         </div>
 
         <div className="w-full mx-auto mb-12">
-          <InputModeToggle 
-            mode={mode} 
-            setMode={setMode} 
-            onTextModeClick={connectWebSocket} 
-            onVoiceModeClick={connectVoiceChat}
-            onExperimentEndClick={handleExperimentEnd}
-          />
+          <InputModeToggle mode={mode} setMode={setMode} />
           <StatusBar message={statusText} type={isRecording ? 'recording' : 'idle'} />
 
           {mode === 'voice' ? (

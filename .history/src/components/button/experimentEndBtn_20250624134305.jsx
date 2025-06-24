@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ManualCancleBtn = ({ onClick }) => {
+const ExperimentEndBtn = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
@@ -8,9 +8,9 @@ const ManualCancleBtn = ({ onClick }) => {
        font-[700] text-[16px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.12)] hover:bg-red-50 hover:border-red-400
         transition duration-200 cursor-pointer"
     >
-      매뉴얼 삭제
+      실험 종료
     </button>
   );
 };
 
-export default ManualCancleBtn;  
+export default ExperimentEndBtn;      

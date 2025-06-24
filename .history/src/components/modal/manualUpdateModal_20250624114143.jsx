@@ -22,7 +22,7 @@ const ManualUpdateModal = ({ manual_id, fileName, onClose, onStart }) => {
       console.log('매뉴얼 업데이트 API 호출 시작...', manual_id);
       
       // PUT 메서드로 매뉴얼 업데이트 (백엔드 API 스펙에 맞게)
-      const response = await fetch(`api/manuals/${manual_id}`, {
+      const response = await fetch(`http://localhost:8000/manuals/${manual_id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {

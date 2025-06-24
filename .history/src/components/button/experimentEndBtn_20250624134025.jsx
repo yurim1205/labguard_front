@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ManualCancleBtn = ({ onClick }) => {
+const ExperimentEndBtn = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
@@ -13,4 +13,4 @@ const ManualCancleBtn = ({ onClick }) => {
   );
 };
 
-export default ManualCancleBtn;  
+export default ExperimentEndBtn;      
