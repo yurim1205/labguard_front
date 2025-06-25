@@ -190,6 +190,35 @@ function ExperimentChat() {
         socketRef.current.close();
       }
       
+      useEffect(() => {
+        const sessionId = location.state?.session_id;
+        if (!sessionId) return;
+      
+        const loadPreviousChat = async () => {
+          try {
+            const res = await fetch(`/api/chat/continue/${sessionId}`, {
+              method: 'GET',
+              credentials: 'include'
+            });
+      
+            if (res.ok) {
+              const data = await res.json();
+              const formatted = data.map((msg) => ({
+                sender: msg.sender === "user" ? "user" : "bot",
+                text: msg.message,
+              }));
+              setMessages((prev) => [...prev, ...formatted]);
+              console.log(" 이전 채팅 불러오기 성공:", formatted);
+            } else {
+              console.warn(" 이전 채팅 불러오기 실패:", res.status);
+            }
+          } catch (err) {
+            console.error(" 채팅 불러오기 중 에러:", err);
+          }
+        };
+      
+        loadPreviousChat();}, []);
+
       // 실험 결과 페이지로 이동하거나 메인 페이지로 돌아가기
       alert('실험이 종료되었습니다. 채팅 로그가 저장되었습니다.');
       
@@ -242,6 +271,36 @@ function ExperimentChat() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    const sessionId = location.state?.session_id;
+    if (!sessionId) return;
+  
+    const loadPreviousChat = async () => {
+      try {
+        const res = await fetch(`/api/chat/continue/${sessionId}`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+  
+        if (res.ok) {
+          const data = await res.json();
+          const formatted = data.map((msg) => ({
+            sender: msg.sender === "user" ? "user" : "bot",
+            text: msg.message,
+          }));
+          setMessages((prev) => [...prev, ...formatted]);
+          console.log("이전 채팅 불러오기 성공:", formatted);
+        } else {
+          console.warn("이전 채팅 불러오기 실패:", res.status);
+        }
+      } catch (err) {
+        console.error("채팅 불러오기 중 에러:", err);
+      }
+    };
+  
+    loadPreviousChat();
+  }, []);
+
   const handleSend = async () => {
     if (!input.trim()) return;
     
@@ -267,33 +326,33 @@ function ExperimentChat() {
       try {
         setStatusText('메시지 전송 중...');
         
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            message: userMessage,
-            manual_id: typeof experimentDetails.manual === 'string' ? experimentDetails.manual : (experimentDetails.manual?.manual_id || experimentDetails.manual?.id || null),
-            user_id: userInfo?.id || userInfo?.user_id || "4",
-            experiment_title: experimentDetails.experiment_title
-          })
-        });
+        // const response = await fetch('/api/chat', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   credentials: 'include',
+        //   body: JSON.stringify({
+        //     message: userMessage,
+        //     manual_id: typeof experimentDetails.manual === 'string' ? experimentDetails.manual : (experimentDetails.manual?.manual_id || experimentDetails.manual?.id || null),
+        //     user_id: userInfo?.id || userInfo?.user_id || "4",
+        //     experiment_title: experimentDetails.experiment_title
+        //   })
+        // });
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log('HTTP 채팅 응답:', data);
-          setMessages((prev) => [...prev, { sender: 'bot', text: data.response || '응답을 받았습니다.' }]);
-          setStatusText('메시지 전송 완료');
-        } else if (response.status === 401) {
-          alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-          navigate('/login');
-        } else {
-          console.error('HTTP 채팅 실패:', response.status);
-          setMessages((prev) => [...prev, { sender: 'bot', text: '죄송합니다. 현재 서버에 문제가 있어 응답할 수 없습니다.' }]);
-          setStatusText('메시지 전송 실패');
-        }
+        // if (response.ok) {
+        //   const data = await response.json();
+        //   console.log('HTTP 채팅 응답:', data);
+        //   setMessages((prev) => [...prev, { sender: 'bot', text: data.response || '응답을 받았습니다.' }]);
+        //   setStatusText('메시지 전송 완료');
+        // } else if (response.status === 401) {
+        //   alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        //   navigate('/login');
+        // } else {
+        //   console.error('HTTP 채팅 실패:', response.status);
+        //   setMessages((prev) => [...prev, { sender: 'bot', text: '죄송합니다. 현재 서버에 문제가 있어 응답할 수 없습니다.' }]);
+        //   setStatusText('메시지 전송 실패');
+        // }
       } catch (error) {
         console.error('HTTP 채팅 에러:', error);
         setMessages((prev) => [...prev, { sender: 'bot', text: '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' }]);
