@@ -35,6 +35,44 @@ function ExperimentChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
 
+  const [sessionId, setSessionId] = useState(() => {
+    return location.state?.session_id || sessionStorage.getItem("session_id") || null;
+  });
+
+  const loadChatLogFromDB = async () => {
+    if (!sessionId) return;
+
+    try {
+      const res = await fetch(`/api/chat/continue/${sessionId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const formatted = data.map((msg) => ({
+          sender: msg.sender === "user" ? "user" : "bot",
+          text: msg.message,
+        }));
+        console.log("포맷된 메시지:", formatted);
+        setMessages((prev) => [...prev, ...formatted]);
+        console.log("이어쓰기 채팅 로드 완료:", formatted);
+      } else {
+        console.warn("이어쓰기 채팅 로드 실패:", res.status);
+      }
+    } catch (err) {
+      console.error("이어쓰기 채팅 로드 중 오류:", err);
+    }
+    console.log("🧾 현재 메시지 상태:", messages);
+  };
+
+  useEffect(() => {
+    if (sessionId) {
+      sessionStorage.setItem("session_id", sessionId);
+      loadChatLogFromDB();
+    }
+  }, [sessionId]);
+
 
   const connectWebSocket = () => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
@@ -52,6 +90,7 @@ function ExperimentChat() {
       // 실험 정보를 서버로 전송
       const experimentInfo = {
         type: 'experiment_info',
+        session_id: sessionId,
         experiment_title: experimentDetails.experiment_title,
         manual: experimentDetails.manual,
         timestamp: new Date().toISOString()
@@ -200,6 +239,12 @@ function ExperimentChat() {
               method: 'GET',
               credentials: 'include'
             });
+            console.log("📡 응답 객체:", res);
+            const rawText = await res.text();
+            console.log("🧾 응답 원문 텍스트:", rawText);
+
+            const data = JSON.parse(rawText);
+            console.log("파싱된 데이터:", data);
       
             if (res.ok) {
               const data = await res.json();
@@ -370,7 +415,8 @@ function ExperimentChat() {
       const messageData = {
         message: userMessage,
         manual_id: typeof experimentDetails.manual === 'string' ? experimentDetails.manual : (experimentDetails.manual?.manual_id || experimentDetails.manual?.id || null),
-        user_id: userInfo?.id || userInfo?.user_id || "4"
+        user_id: userInfo?.id || userInfo?.user_id || "4",
+        session_id: sessionId
       };
       
       console.log('WebSocket 메시지 전송:', messageData);
@@ -409,6 +455,7 @@ function ExperimentChat() {
       
       const formData = new FormData();
       formData.append('file', audioBlob, 'audio.wav');
+      formData.append('session_id', sessionId);
       formData.append('experiment_title', experimentDetails.experiment_title);
       formData.append('manual_id', experimentDetails.manual?.manual_id || '');
       formData.append('manual_filename', experimentDetails.manual?.filename || '');

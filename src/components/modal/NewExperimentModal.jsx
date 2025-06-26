@@ -68,12 +68,10 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
     }
   
     try {
-      const sessionId = uuidv4();
       const requestData = {
         title: experiment_title,
         manual_id: String(selectedManual),
         user_id: parseInt(currentUserId), // 정수형으로 변환
-        session_id: sessionId,
         experiment_date: new Date().toISOString().slice(0, 10),
       };
       
@@ -113,6 +111,9 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
       const selectedManualData = manuals.find(
         (manual) => manual.manual_id === parseInt(selectedManual)
       );
+
+      // session_id는 채팅을 위해 여전히 생성할 수 있음
+      const sessionId = uuidv4();
   
       // 백엔드에서 반환받은 세션 ID로 실험 채팅 페이지로 이동
       console.log('실험 채팅 페이지로 이동:', {
