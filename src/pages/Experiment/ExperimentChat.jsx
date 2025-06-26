@@ -106,15 +106,17 @@ function ExperimentChat() {
       console.log('WebSocket 메시지 수신:', data);
       setIsTyping(false);
     
-      // 'answer'와 'type'에 따라 출력 메시지 구성
       if (data.answer) {
         setMessages((prev) => [...prev, { sender: 'ai', text: data.answer }]);
       } 
-      // else if (data.error) {
-      //   setMessages((prev) => [...prev, { sender: 'ai', text: `⚠️ 서버 오류: ${data.error}` }]);
-      // } 
       else {
         setMessages((prev) => [...prev, { sender: 'ai', text: '[알 수 없는 응답]' }]);
+      }
+      
+      // TTS 오디오 URL이 있으면 설정
+      if (data.audio_url) {
+        setAudioUrl(data.audio_url);
+        console.log('TTS 오디오 URL 설정:', data.audio_url);
       }
     };
     
@@ -352,14 +354,20 @@ function ExperimentChat() {
     
     // WebSocket이 연결되어 있으면 WebSocket 사용
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      // manual_id 처리 - null 대신 빈 문자열 또는 실제 값 사용
+      const manualId = typeof experimentDetails.manual === 'string' 
+        ? experimentDetails.manual 
+        : (experimentDetails.manual?.manual_id || experimentDetails.manual?.id || '');
+      
       const messageData = {
         message: userMessage,
-        manual_id: typeof experimentDetails.manual === 'string' ? experimentDetails.manual : (experimentDetails.manual?.manual_id || experimentDetails.manual?.id || null),
+        manual_id: manualId,
         user_id: userInfo?.id || userInfo?.user_id || "4",
-        session_id: sessionId
+        session_id: sessionId || ''
       };
       
       console.log('WebSocket 메시지 전송:', messageData);
+      console.log('실험 매뉴얼 정보:', experimentDetails.manual);
       
       socketRef.current.send(JSON.stringify(messageData));
     } else {
@@ -399,10 +407,10 @@ function ExperimentChat() {
         setAudioBlob(audioBlob);
         console.log('녹음 완료, 오디오 블롭 생성됨, 크기:', audioBlob.size);
         
-        // 녹음 완료 후 자동으로 서버에 전송
+        // 녹음 완료 후 자동으로 서버에 전송 (audioBlob을 직접 전달)
         setTimeout(() => {
           console.log('handleVoiceSubmit 호출 시작');
-          handleVoiceSubmit();
+          handleVoiceSubmit(audioBlob);
         }, 100);
       };
       
@@ -430,10 +438,10 @@ function ExperimentChat() {
     }
   };
 
-    const handleVoiceSubmit = async () => {
-    console.log('handleVoiceSubmit 함수 시작, audioBlob:', audioBlob);
+    const handleVoiceSubmit = async (blob = audioBlob) => {
+    console.log('handleVoiceSubmit 함수 시작, audioBlob:', blob);
     
-    if (!audioBlob) {
+    if (!blob) {
       console.log('audioBlob이 없음');
       setStatusText('녹음된 음성이 없습니다 - 마이크 버튼을 눌러 녹음하세요');
       return;
@@ -441,7 +449,7 @@ function ExperimentChat() {
     
     try {
       console.log('음성 파일 전송 중...', {
-        blobSize: audioBlob.size,
+        blobSize: blob.size,
         sessionId: sessionId,
         userId: userInfo?.id || userInfo?.user_id,
         manualId: experimentDetails.manual?.manual_id
@@ -450,7 +458,7 @@ function ExperimentChat() {
       setIsTyping(true);
       
       const formData = new FormData();
-      formData.append('audio', audioBlob, 'audio.wav');
+      formData.append('audio', blob, 'audio.wav');
       formData.append('session_id', sessionId || '');
       
       // manual_id 처리 - 빈 문자열 대신 null 또는 실제 값 전송
@@ -466,7 +474,7 @@ function ExperimentChat() {
                       
                       // FormData 내용 확인
                       console.log('전송할 데이터:', {
-                        audioSize: audioBlob.size,
+                        audioSize: blob.size,
                         sessionId: sessionId || '',
                         manualId: manualId,
                         userId: userInfo?.id || userInfo?.user_id || '',
@@ -613,7 +621,7 @@ function ExperimentChat() {
         )}
 
         {/* 오디오 플레이어 */}
-        {audioUrl && <AudioPlayer audioUrl={audioUrl} />}
+        {audioUrl && <AudioPlayer url={audioUrl} />}
       </div>
     </>
   );
