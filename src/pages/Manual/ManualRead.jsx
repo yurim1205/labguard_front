@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import ManualCancleBtn from '../../components/button/manualCancleBtn';
 import DangerResultBtn from '../../components/button/dangerResultBtn';
+import { useAuthStore } from '../../store/useAuthStore';
 
 function ManualRead() {
   const fileInputRef = useRef();
@@ -15,9 +16,16 @@ function ManualRead() {
   
   // 매뉴얼 데이터 상태
   const [manualData, setManualData] = useState(null);
-  const [chunks, setChunks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // 매뉴얼 요약 데이터 상태
+  const [summaryData, setSummaryData] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState(null);
+  
+  // 토큰 가져오기
+  const { token } = useAuthStore();
 
   // 매뉴얼 데이터 불러오기
   useEffect(() => {
@@ -34,39 +42,44 @@ function ManualRead() {
       try {
         console.log('📖 매뉴얼 데이터 로드 시작:', manual_id);
         
+        // 요청 헤더 설정
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+        
+        // 토큰이 있으면 Authorization 헤더 추가
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
         // 매뉴얼 정보 가져오기
         const manualResponse = await fetch(`/api/manuals/${manual_id}`, {
           method: 'GET',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: headers,
         });
 
         if (!manualResponse.ok) {
-          throw new Error(`매뉴얼 정보 조회 실패: HTTP ${manualResponse.status}`);
+          let errorMessage = `매뉴얼 정보 조회 실패: HTTP ${manualResponse.status}`;
+          try {
+            const errorData = await manualResponse.json();
+            console.error('📖 매뉴얼 조회 에러 상세:', errorData);
+            errorMessage = errorData.detail || errorData.message || errorMessage;
+          } catch (jsonError) {
+            console.error('📖 에러 응답 파싱 실패:', jsonError);
+          }
+          throw new Error(errorMessage);
         }
 
         const manual = await manualResponse.json();
         console.log('📖 매뉴얼 정보:', manual);
-        setManualData(manual);
-
-        // 청크 데이터 가져오기
-        const chunksResponse = await fetch(`/api/manual/chunks?manual_id=${manual_id}`, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+        console.log('📖 매뉴얼 정보 상세:', {
+          id: manual.id,
+          manual_id: manual.manual_id,
+          title: manual.title,
+          user_id: manual.user_id
         });
-
-        if (!chunksResponse.ok) {
-          throw new Error(`청크 데이터 조회 실패: HTTP ${chunksResponse.status}`);
-        }
-
-        const chunksData = await chunksResponse.json();
-        console.log('📖 청크 데이터:', chunksData);
-        setChunks(chunksData.chunks || chunksData || []);
+        setManualData(manual);
 
       } catch (error) {
         console.error('📖 매뉴얼 데이터 로드 오류:', error);
@@ -77,7 +90,60 @@ function ManualRead() {
     };
 
     fetchManualData();
-  }, [manual_id, navigate]);
+  }, [manual_id, navigate, token]);
+
+  // 매뉴얼 요약 데이터 불러오기
+  useEffect(() => {
+    if (!manual_id) return;
+
+    const fetchSummaryData = async () => {
+      setSummaryLoading(true);
+      setSummaryError(null);
+
+      try {
+        console.log('📊 매뉴얼 요약 데이터 로드 시작:', manual_id);
+        
+        // 요청 헤더 설정
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+        
+        // 토큰이 있으면 Authorization 헤더 추가
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const summaryResponse = await fetch(`/api/manual-summary/manual/${manual_id}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: headers,
+        });
+
+        console.log('📊 요약 응답 상태:', summaryResponse.status, summaryResponse.statusText);
+
+        if (!summaryResponse.ok) {
+          if (summaryResponse.status === 404) {
+            // 404는 요약이 없는 경우로 처리
+            setSummaryData({ experiment_summaries: [] });
+            return;
+          }
+          throw new Error(`매뉴얼 요약 조회 실패: HTTP ${summaryResponse.status}`);
+        }
+
+        const summary = await summaryResponse.json();
+        console.log('📊 매뉴얼 요약 데이터:', summary);
+        setSummaryData(summary);
+
+      } catch (error) {
+        console.error('📊 매뉴얼 요약 로드 오류:', error);
+        setSummaryError(error.message);
+      } finally {
+        setSummaryLoading(false);
+      }
+    };
+
+    fetchSummaryData();
+  }, [manual_id, token]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -91,18 +157,38 @@ function ManualRead() {
 
   // 매뉴얼 삭제 핸들러
   const handleDelete = async () => {
+    // 매뉴얼 데이터가 로드되지 않은 경우
+    if (!manualData) {
+      alert('매뉴얼 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
     const confirmed = window.confirm("이 매뉴얼을 삭제하시겠습니까?\n삭제된 매뉴얼은 복구할 수 없습니다.");
     if (!confirmed) return;
 
+    // 실제 매뉴얼 ID 결정 (백엔드에서 반환된 실제 ID 사용)
+    // 우선순위: manual_id (UUID) > id (숫자) > 원본 manual_id
+    const actualManualId = manualData?.manual_id || manualData?.id || manual_id;
+    
     try {
-      console.log('🗑️ 매뉴얼 삭제 요청:', manual_id);
+      console.log('🗑️ 매뉴얼 삭제 요청:', actualManualId);
+      console.log('🗑️ 매뉴얼 데이터:', manualData);
+      console.log('🗑️ 원본 manual_id:', manual_id);
       
-      const response = await fetch(`/api/manuals/${manual_id}`, {
+      // 요청 헤더 설정
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      // 토큰이 있으면 Authorization 헤더 추가
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch(`/api/manuals/${actualManualId}`, {
         method: 'DELETE',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: headers,
       });
 
       console.log('🗑️ 삭제 응답 상태:', response.status, response.statusText);
@@ -143,17 +229,7 @@ function ManualRead() {
     }
   };
 
-  // 위험도 분석 결과 버튼 클릭 핸들러
-  const handleDangerResult = () => {
-    console.log('📊 위험도 분석 결과 버튼 클릭 - 매뉴얼 ID:', manual_id);
-    // RiskAnalyzeResult 페이지로 이동하면서 manual_id 전달
-    navigate('/RiskAnalyzeResult', { 
-      state: { 
-        manual_id: manual_id,
-        manualData: manualData 
-      } 
-    });
-  };
+
 
 
 
@@ -177,57 +253,78 @@ function ManualRead() {
           </div>
         )}
 
-        <section className="bg-[#ecece7] min-h-[560px] rounded-lg p-10 mb-10 pt-[24px] px-[100px] relative">
-          <section className="bg-[#EDF2FF] min-h-[450px] rounded-lg p-10 mb-10 pt-[24px]">
-            {loading && (
-              <div className="text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
-                <p className="text-gray-600">매뉴얼 내용을 불러오는 중...</p>
-              </div>
-            )}
+        {/* 실험별 요약 섹션 */}
+        <section className="mb-6">
+          <h2 className="text-[20px] font-bold text-left font-[500] mb-4">📋 실험별 요약</h2>
+          
+          {summaryLoading && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+              <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mb-2"></div>
+              <p className="text-blue-700">요약 불러오는 중...</p>
+            </div>
+          )}
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                <h4 className="font-bold text-red-800 mb-2">❌ 매뉴얼 로드 실패</h4>
-                <p className="text-red-700">{error}</p>
-              </div>
-            )}
+          {summaryError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+              <h4 className="font-bold text-red-800 mb-2">❌ 요약 로드 실패</h4>
+              <p className="text-red-700">{summaryError}</p>
+            </div>
+          )}
 
-            {!loading && !error && chunks.length > 0 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">📋 매뉴얼 내용</h3>
-                {chunks.map((chunk, index) => (
-                  <div key={index} className="bg-white rounded-lg p-6 border border-gray-200">
-                    <div className="text-gray-800 leading-relaxed text-base whitespace-pre-wrap">
-                      {chunk.page_content || '내용이 없습니다.'}
-                    </div>
+          {!summaryLoading && !summaryError && summaryData && (
+            <>
+              {summaryData.experiment_summaries && summaryData.experiment_summaries.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-green-800 font-medium">
+                      ✅ 총 {summaryData.total_experiments || summaryData.experiment_summaries.length}개의 실험 요약이 있습니다.
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
-
-            {!loading && !error && chunks.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-gray-600">분석된 매뉴얼 내용이 없습니다.</p>
-              </div>
-            )}
-          </section>
-
-          <div className="absolute bottom-5 right-[100px]">
-            <div className='flex gap-[10px]'> 
-              <button
-                onClick={handleCancel}
-                className="px-[24px] py-[7px] mt-[10px] border border-gray-300 rounded-[10px] bg-white text-gray-600
-                 font-[700] text-[16px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.12)] hover:bg-gray-100 hover:border-gray-400
-                  transition duration-200 cursor-pointer"
-              >
-                목록으로 돌아가기
-              </button>
-              <DangerResultBtn onClick={handleDangerResult} />
-              <ManualCancleBtn onClick={handleDelete} />
-            </div> 
-          </div>
+                  {summaryData.experiment_summaries.map((experiment, index) => (
+                    <div key={experiment.experiment_id || index} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-lg font-bold text-gray-800">
+                          🧪 목차 {index + 1}
+                        </h3>
+                        {/* <div className="text-sm text-gray-500 space-y-1">
+                          <p>실험 ID: {experiment.experiment_id}</p>
+                          <p>청크 수: {experiment.chunk_count}</p>
+                          {experiment.created_at && (
+                            <p>생성일: {new Date(experiment.created_at * 1000).toLocaleString('ko-KR')}</p>
+                          )}
+                        </div> */}
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="text-gray-800 leading-relaxed text-base whitespace-pre-wrap">
+                          {experiment.summary || '요약 내용이 없습니다.'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+                  <p className="text-gray-600 text-lg">요약 결과가 없습니다.</p>
+                  <p className="text-gray-500 text-sm mt-2">아직 이 매뉴얼에 대한 실험별 요약이 생성되지 않았습니다.</p>
+                </div>
+              )}
+            </>
+          )}
         </section>
+
+        {/* 버튼 섹션 */}
+        <div className="flex justify-end gap-[10px] mt-8">
+          <button
+            onClick={handleCancel}
+            className="px-[24px] py-[7px] mt-[10px] border border-gray-300 rounded-[10px] bg-white text-gray-600
+             font-[700] text-[16px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.12)] hover:bg-gray-100 hover:border-gray-400
+              transition duration-200 cursor-pointer"
+          >
+            목록으로 돌아가기
+          </button>
+          <DangerResultBtn manual_id={manual_id} />
+          <ManualCancleBtn onClick={handleDelete} />
+        </div>
       </div>
     </>
   );

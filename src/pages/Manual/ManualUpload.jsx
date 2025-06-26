@@ -41,7 +41,7 @@ function ManualUpload() {
       if (!response.ok) {
         if (response.status === 401) {
           console.log('🔐 인증 오류 - 로그인 필요');
-          navigate('/login');
+          setManualsError('로그인이 필요하거나 세션이 만료되었습니다.');
           return;
         }
         throw new Error(`매뉴얼 목록 조회 실패: HTTP ${response.status}`);
@@ -325,34 +325,31 @@ function ManualUpload() {
           {/* 업로드된 매뉴얼 목록 (filename과 uploaded_at만 표시) */}
           {!manualsLoading && uploadedManuals.length > 0 && (
             <div className="space-y-4">
-              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-800 font-medium">✅ {uploadedManuals.length}개의 매뉴얼이 등록되어 있습니다.</p>
-              </div>
               {uploadedManuals.map((manual, index) => (
                 <div 
                   key={manual.manual_id || index} 
                   onClick={() => handleManualClick(manual.manual_id)}
                   className="bg-white border border-[#b5b5b5] rounded-[10px] overflow-hidden cursor-pointer hover:bg-gray-50 hover:border-[#0E467B] transition-all duration-200 hover:shadow-md"
                 >
-                  <div className="flex items-center justify-between px-8 py-6">
-                    <div className="flex items-center gap-4">
-                      <img src={equipment} alt="equipment" className="w-[28px] h-[28px]" />
-                      <div className="flex flex-col">
-                        <span className="text-[#33308B] font-semibold text-[1.05rem] hover:text-[#0E467B]">
-                          {manual.filename || manual.title}
-                        </span>
-                        <span className="text-xs text-gray-500 mt-1">
-                          상태: {manual.status} | ID: {manual.manual_id}
-                        </span>
+                  <div className="flex items-center justify-between px-8 py-8 min-h-[60px]">
+                                          <div className="flex items-center gap-4">
+                        <img src={equipment} alt="equipment" className="w-[28px] h-[28px]" />
+                        <div className="flex flex-col py-1">
+                          <span className="text-[#33308B] font-semibold text-[1.1rem] hover:text-[#0E467B] leading-relaxed">
+                            {manual.filename || manual.title}
+                          </span>
+                          {/* <span className="text-xs text-gray-500 mt-1">
+                            상태: {manual.status} | ID: {manual.manual_id}
+                          </span> */}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-[#33308B] text-[0.95rem]">
-                        {new Date(manual.uploaded_at).toLocaleString('ko-KR')}
-                      </div>
-                      <div className="text-gray-400 text-sm">
+                                          <div className="flex items-center gap-2 py-1">
+                        <div className="text-[#33308B] text-[0.95rem] leading-relaxed">
+                          {new Date(manual.uploaded_at).toLocaleString('ko-KR')}
+                        </div>
+                      {/* <div className="text-gray-400 text-sm">
                         👆 클릭하여 읽기
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
