@@ -34,6 +34,46 @@ function ExperimentChat() {
   const socketRef = useRef(null);
   const [isTyping, setIsTyping] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioStream, setAudioStream] = useState(null);
+
+  const [sessionId, setSessionId] = useState(() => {
+    return location.state?.session_id || sessionStorage.getItem("session_id") || null;
+  });
+
+  const loadChatLogFromDB = async () => {
+    if (!sessionId) return;
+
+    try {
+      const res = await fetch(`/api/chat/continue/${sessionId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const formatted = data.map((msg) => ({
+          sender: msg.sender === "user" ? "user" : "bot",
+          text: msg.message,
+        }));
+        console.log("포맷된 메시지:", formatted);
+        setMessages((prev) => [...prev, ...formatted]);
+        console.log("이어쓰기 채팅 로드 완료:", formatted);
+      } else {
+        console.warn("이어쓰기 채팅 로드 실패:", res.status);
+      }
+    } catch (err) {
+      console.error("이어쓰기 채팅 로드 중 오류:", err);
+    }
+    console.log("🧾 현재 메시지 상태:", messages);
+  };
+
+  useEffect(() => {
+    if (sessionId) {
+      sessionStorage.setItem("session_id", sessionId);
+      loadChatLogFromDB();
+    }
+  }, [sessionId]);
 
 
   const connectWebSocket = () => {
@@ -52,6 +92,7 @@ function ExperimentChat() {
       // 실험 정보를 서버로 전송
       const experimentInfo = {
         type: 'experiment_info',
+        session_id: sessionId,
         experiment_title: experimentDetails.experiment_title,
         manual: experimentDetails.manual,
         timestamp: new Date().toISOString()
@@ -98,68 +139,6 @@ function ExperimentChat() {
     };
   };
 
-  const connectVoiceChat = async () => {
-    try {
-      console.log('음성 채팅 연결 시도 중...');
-      setStatusText('음성 모드 활성화 중...');
-      
-      const response = await fetch('/api/web-voice/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          action: 'connect',
-          message: '음성 모드 활성화',
-          experiment_title: experimentDetails.experiment_title,
-          manual: experimentDetails.manual,
-          timestamp: new Date().toISOString()
-        })
-      });
-
-      if (response.ok) {
-        try {
-          const data = await response.json();
-          console.log('음성 채팅 연결 성공:', data);
-          setStatusText('음성 모드 활성화 - 마이크 버튼을 눌러 녹음하세요');
-          setMessages((prev) => [...prev, { sender: 'bot', text: '음성 모드가 활성화되었습니다. 마이크 버튼을 눌러서 말씀해주세요! 🎤' }]);
-        } catch (jsonError) {
-          console.error('음성 채팅 응답 JSON 파싱 실패:', jsonError);
-          const responseText = await response.text();
-          console.error('음성 채팅 응답 원문:', responseText);
-          setStatusText('음성 모드 활성화 - 서버 응답 처리 중 문제가 발생했지만 연결되었습니다');
-        }
-      } else if (response.status === 401) {
-        console.error('음성 채팅 인증 실패 - 로그인 필요');
-        alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
-        navigate('/login');
-      } else {
-        // 에러 응답 처리
-        let errorMessage = `음성 모드 연결 실패 (${response.status})`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.detail || errorData.message || errorMessage;
-        } catch (jsonError) {
-          const responseText = await response.text();
-          console.error('에러 응답 원문:', responseText);
-          if (responseText.includes('Internal Server Error')) {
-            errorMessage = '서버 내부 오류가 발생했습니다';
-          }
-        }
-        console.error('음성 채팅 연결 실패:', response.status, response.statusText);
-        setStatusText(errorMessage);
-      }
-    } catch (error) {
-      console.error('음성 채팅 연결 에러:', error);
-      if (error.message === 'Failed to fetch') {
-        setStatusText('서버에 연결할 수 없습니다 - 백엔드 서버를 확인해주세요');
-      } else {
-        setStatusText('음성 모드 연결 에러 - 네트워크를 확인해주세요');
-      }
-    }
-  };
-
   const handleExperimentEnd = () => {
     const confirmEnd = window.confirm(
       '실험을 종료하시겠습니까?\n\n종료하면 현재까지의 채팅 내용이 실험 로그로 저장됩니다.'
@@ -200,6 +179,12 @@ function ExperimentChat() {
               method: 'GET',
               credentials: 'include'
             });
+            console.log("📡 응답 객체:", res);
+            const rawText = await res.text();
+            console.log("🧾 응답 원문 텍스트:", rawText);
+
+            const data = JSON.parse(rawText);
+            console.log("파싱된 데이터:", data);
       
             if (res.ok) {
               const data = await res.json();
@@ -370,7 +355,8 @@ function ExperimentChat() {
       const messageData = {
         message: userMessage,
         manual_id: typeof experimentDetails.manual === 'string' ? experimentDetails.manual : (experimentDetails.manual?.manual_id || experimentDetails.manual?.id || null),
-        user_id: userInfo?.id || userInfo?.user_id || "4"
+        user_id: userInfo?.id || userInfo?.user_id || "4",
+        session_id: sessionId
       };
       
       console.log('WebSocket 메시지 전송:', messageData);
@@ -391,28 +377,102 @@ function ExperimentChat() {
   };
   
 
-  const handleMicClick = () => {
-    setIsRecording((prev) => !prev);
-    setStatusText((prev) => (isRecording ? '녹음 중지됨' : '녹음 중...'));
+  const handleMicClick = async () => {
+    // 녹음 시작만 담당
+    if (isRecording) return; // 이미 녹음 중이면 무시
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setAudioStream(stream);
+      console.log('마이크 접근 허용됨, 녹음 시작');
+      
+      const recorder = new MediaRecorder(stream);
+      setMediaRecorder(recorder);
+      const audioChunks = [];
+      
+      recorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+      
+      recorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        setAudioBlob(audioBlob);
+        console.log('녹음 완료, 오디오 블롭 생성됨, 크기:', audioBlob.size);
+        
+        // 녹음 완료 후 자동으로 서버에 전송
+        setTimeout(() => {
+          console.log('handleVoiceSubmit 호출 시작');
+          handleVoiceSubmit();
+        }, 100);
+      };
+      
+      recorder.start();
+      setIsRecording(true);
+      setStatusText('녹음 중... 녹음 중지 버튼을 눌러 완료하세요');
+      
+    } catch (error) {
+      console.error('마이크 접근 실패:', error);
+      setStatusText('마이크 접근 실패 - 브라우저에서 마이크 권한을 허용해주세요');
+      setIsRecording(false);
+    }
   };
 
-  const handleVoiceSubmit = async () => {
+  const handleStopRecording = () => {
+    // 녹음 중지 및 서버 전송
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+      }
+      setIsRecording(false);
+      setStatusText('녹음 완료 - 음성 처리 중...');
+      console.log('녹음 중지됨 - 서버 전송 대기');
+    }
+  };
+
+    const handleVoiceSubmit = async () => {
+    console.log('handleVoiceSubmit 함수 시작, audioBlob:', audioBlob);
+    
     if (!audioBlob) {
+      console.log('audioBlob이 없음');
       setStatusText('녹음된 음성이 없습니다 - 마이크 버튼을 눌러 녹음하세요');
       return;
     }
     
     try {
-      console.log('음성 파일 전송 중...');
+      console.log('음성 파일 전송 중...', {
+        blobSize: audioBlob.size,
+        sessionId: sessionId,
+        userId: userInfo?.id || userInfo?.user_id,
+        manualId: experimentDetails.manual?.manual_id
+      });
       setStatusText('음성 처리 중...');
       setIsTyping(true);
       
       const formData = new FormData();
-      formData.append('file', audioBlob, 'audio.wav');
-      formData.append('experiment_title', experimentDetails.experiment_title);
-      formData.append('manual_id', experimentDetails.manual?.manual_id || '');
-      formData.append('manual_filename', experimentDetails.manual?.filename || '');
-      formData.append('timestamp', new Date().toISOString());
+      formData.append('audio', audioBlob, 'audio.wav');
+      formData.append('session_id', sessionId || '');
+      
+      // manual_id 처리 - 빈 문자열 대신 null 또는 실제 값 전송
+      const manualId = experimentDetails.manual?.manual_id || 
+                      experimentDetails.manual?.id || 
+                      (typeof experimentDetails.manual === 'string' ? experimentDetails.manual : null);
+                      if (manualId) {
+                        formData.append('manual_id', manualId);
+                      }
+                      // manual_id가 없으면 아예 전송하지 않음 (빈 문자열 전송 방지)
+                      
+                      formData.append('user_id', userInfo?.id || userInfo?.user_id || '');
+                      
+                      // FormData 내용 확인
+                      console.log('전송할 데이터:', {
+                        audioSize: audioBlob.size,
+                        sessionId: sessionId || '',
+                        manualId: manualId,
+                        userId: userInfo?.id || userInfo?.user_id || '',
+                        experimentDetails: experimentDetails,
+                        userInfo: userInfo
+                      });
 
       const response = await fetch('/api/stt/voice/chat', {
         method: 'POST',
@@ -426,8 +486,8 @@ function ExperimentChat() {
         
         setMessages((prev) => [
           ...prev,
-          { sender: 'user', text: '[음성 입력]' },
-          { sender: 'bot', text: data.response || '음성이 처리되었습니다.' },
+          { sender: 'user', text: data.input_text || '[음성 입력]' },
+          { sender: 'bot', text: data.response_text || '음성이 처리되었습니다.' },
         ]);
         
         if (data.audio_url) {
@@ -435,14 +495,28 @@ function ExperimentChat() {
         }
         
         setStatusText('음성 처리 완료');
-        setAudioBlob(null); // 전송 후 오디오 블롭 초기화
+        setAudioBlob(null);
       } else if (response.status === 401) {
-        console.error('음성 처리 인증 실패 - 로그인 필요');
-        alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
+        alert('로그인이 필요합니다. 다시 로그인해주세요.');
         navigate('/login');
       } else {
-        console.error('음성 처리 실패:', response.status, response.statusText);
-        setStatusText('음성 처리 실패 - 다시 시도해주세요');
+        // 에러 응답 본문 확인
+        let errorText = '';
+        try {
+          const errorData = await response.json();
+          errorText = JSON.stringify(errorData);
+          console.error('에러 응답 JSON:', errorData);
+        } catch (jsonError) {
+          try {
+            errorText = await response.text();
+            console.error('에러 응답 텍스트:', errorText);
+          } catch (textError) {
+            console.error('응답 읽기 실패:', textError);
+          }
+        }
+
+        setStatusText(`음성 처리 실패 (${response.status}) - 다시 시도해주세요`);
+        console.error('음성 처리 실패:', response.status, response.statusText, errorText);
       }
     } catch (error) {
       console.error('음성 전송 에러:', error);
@@ -510,7 +584,10 @@ function ExperimentChat() {
           mode={mode} 
           onModeChange={setMode}
           onTextModeClick={connectWebSocket}
-          onVoiceModeClick={connectVoiceChat}
+          onVoiceModeClick={() => {
+            connectWebSocket();
+            setStatusText('음성 모드 활성화됨 - 마이크 버튼을 눌러 녹음하세요');
+          }}
         />
 
         {/* 상태 표시 */}
@@ -530,8 +607,8 @@ function ExperimentChat() {
           <VoiceControls
             isRecording={isRecording}
             onMicClick={handleMicClick}
-            onVoiceSubmit={handleVoiceSubmit}
-            setAudioBlob={setAudioBlob}
+            onStopRecording={handleStopRecording}
+            statusText={statusText}
           />
         )}
 
