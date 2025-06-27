@@ -32,25 +32,15 @@ function Dashboard() {
     },
   ];
 
-  // 최근 업데이트 더미 데이터
-  const updates = [
-    { type: '매뉴얼', date: '2024-06-02 12:01', title: '저장 수소 생산', link: '#' },
-    { type: '실험일지', date: '2024-06-02 10:22', title: '수소저장 실험 일지', link: '#' },
-  ];
-
   return (
     <>
       <Header />
       <main className="max-w-[1100px] mx-auto">
-        <h2 className="text-2xl mb-10 text-neutral-900 font-normal">
-          안녕하세요, <span className="font-bold">{user?.name || '사용자'}</span>님
-        </h2>
         <div className="flex gap-[20px] justify-center">
           {cards.map((card, idx) => (
             <MenuCard key={idx} img={card.img} title={card.title} desc={card.desc} link={card.link} imgSize={card.imgSize} />
           ))}
         </div>
-        <RecentUpdateTable updates={updates} />
       </main>
     </>
   );
