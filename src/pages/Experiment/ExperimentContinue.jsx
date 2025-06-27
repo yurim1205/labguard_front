@@ -99,12 +99,12 @@ function ExperimentContinue() {
 
   // 실험 이어하기 핸들러
   const handleContinueExperiment = (experiment) => {
-    navigate(`/ExperimentChat/session/${experiment.session_id}`, {
+    navigate(`/ExperimentChat/experiment/${experiment.experiment_id}`, {
       state: {
         experiment_id: experiment.experiment_id,
         experiment_title: experiment.title,
         manual: experiment.manual_id,
-        session_id: experiment.session_id,
+        experiment_id: experiment.experiment_id,
       },
     });
   };
