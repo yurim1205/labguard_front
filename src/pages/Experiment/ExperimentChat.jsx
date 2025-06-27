@@ -258,7 +258,89 @@ function ExperimentChat() {
       setExperimentDetails(locationDetails);
       console.log('새 실험 시작 - location.state에서 실험 정보 설정:', locationDetails);
     }
+
+    ///////////브리핑////////////////////
+
+    // 브리핑 자동 재생 및 메시지 표시
+    console.log('브리핑 자동재생 대상:', location.state?.audio_url, location.state?.summary);
     
+    if (location.state?.audio_url && location.state?.summary) {
+      console.log('🎯 브리핑 데이터 감지:', {
+        audio_url: location.state.audio_url,
+        summary: location.state.summary
+      });
+
+      // 브리핑 메시지를 시스템 메시지로 추가
+      const briefingMessage = {
+        sender: 'bot',
+        text: `📋 **[위험요소 브리핑]**\n\n${location.state.summary}`,
+        isSystemMessage: true
+      };
+
+      setMessages((prevMessages) => {
+        // 이미 브리핑 메시지가 있는지 확인 (중복 방지)
+        const hasBriefing = prevMessages.some(msg => 
+          msg.text && msg.text.includes('[위험요소 브리핑]')
+        );
+        
+        if (!hasBriefing) {
+          console.log('🎯 브리핑 메시지 추가');
+          return [briefingMessage, ...prevMessages];
+        }
+        return prevMessages;
+      });
+
+      // 브리핑 음성 자동 재생
+      try {
+        console.log('🎯 브리핑 음성 재생 시작:', location.state.audio_url);
+        const briefingAudio = new Audio(location.state.audio_url);
+        
+        briefingAudio.onloadeddata = () => {
+          console.log('🎯 브리핑 음성 로드 완료');
+        };
+        
+        briefingAudio.onplay = () => {
+          console.log('🎯 브리핑 음성 재생 시작');
+          setStatusText('브리핑 음성 재생 중...');
+        };
+        
+        briefingAudio.onended = () => {
+          console.log('🎯 브리핑 음성 재생 완료');
+          setStatusText('브리핑 완료 - 실험을 시작해주세요');
+        };
+        
+        briefingAudio.onerror = (error) => {
+          console.error('🎯 브리핑 음성 재생 에러:', error);
+          setStatusText('브리핑 음성 재생 실패');
+        };
+
+        // 브라우저 자동재생 정책에 따라 사용자 상호작용 후 재생될 수 있음
+        briefingAudio.play().catch((error) => {
+          console.log('🎯 브리핑 음성 자동재생 실패 (사용자 상호작용 필요):', error);
+          setStatusText('브리핑 준비 완료 - 화면을 클릭하여 음성을 들어보세요');
+          
+          // 사용자 클릭 시 재생되도록 이벤트 리스너 추가
+          const playOnClick = () => {
+            briefingAudio.play().then(() => {
+              setStatusText('브리핑 음성 재생 중...');
+              document.removeEventListener('click', playOnClick);
+            }).catch((err) => {
+              console.error('🎯 클릭 후 재생 실패:', err);
+            });
+          };
+          document.addEventListener('click', playOnClick, { once: true });
+        });
+
+      } catch (audioError) {
+        console.error('🎯 브리핑 음성 객체 생성 실패:', audioError);
+        setStatusText('브리핑 음성 로드 실패');
+      }
+    }
+    
+
+//////////////////////브리핑 끝//////////////////////
+
+
     return () => {
       if (socketRef.current) {
         socketRef.current.close();
@@ -579,9 +661,11 @@ function ExperimentChat() {
             <div className={`max-w-[70%] p-3 rounded-lg ${
               msg.sender === 'user' 
                 ? 'bg-[#E6E6FA] text-black' 
-                : 'bg-[#F2F2F2] text-black'
+                : msg.isSystemMessage 
+                  ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 text-gray-800 shadow-md'
+                  : 'bg-[#F2F2F2] text-black'
             }`}>
-              <p className="whitespace-pre-wrap">{msg.text}</p>
+              <p className="whitespace-pre-wrap font-medium">{msg.text}</p>
             </div>
           </motion.div>
         ))}
