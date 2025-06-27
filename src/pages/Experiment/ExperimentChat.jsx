@@ -369,7 +369,7 @@ function ExperimentChat() {
       try {
         console.log('실험 정보 로드 시도:', experimentId);
         
-        const res = await fetch(`/api/experiment/experiment/${experimentId}`, {
+        const res = await fetch(`/api/experiment/${experimentId}`, {
           method: 'GET',
           credentials: 'include'
         });
