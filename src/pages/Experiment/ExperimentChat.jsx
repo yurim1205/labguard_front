@@ -75,6 +75,44 @@ function ExperimentChat() {
     }
   }, [experimentId]);
 
+  const [sessionId, setSessionId] = useState(() => {
+    return location.state?.session_id || sessionStorage.getItem("session_id") || null;
+  });
+
+  const loadChatLogFromDB = async () => {
+    if (!sessionId) return;
+
+    try {
+      const res = await fetch(`/api/chat/continue/${sessionId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const formatted = data.map((msg) => ({
+          sender: msg.sender === "user" ? "user" : "bot",
+          text: msg.message,
+        }));
+        console.log("포맷된 메시지:", formatted);
+        setMessages((prev) => [...prev, ...formatted]);
+        console.log("이어쓰기 채팅 로드 완료:", formatted);
+      } else {
+        console.warn("이어쓰기 채팅 로드 실패:", res.status);
+      }
+    } catch (err) {
+      console.error("이어쓰기 채팅 로드 중 오류:", err);
+    }
+    console.log("🧾 현재 메시지 상태:", messages);
+  };
+
+  useEffect(() => {
+    if (sessionId) {
+      sessionStorage.setItem("session_id", sessionId);
+      loadChatLogFromDB();
+    }
+  }, [sessionId]);
+
 
   const connectWebSocket = () => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
