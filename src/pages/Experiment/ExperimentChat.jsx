@@ -5,7 +5,7 @@ import ChatInput from '../../components/ChatInput';
 import VoiceControls from '../../components/VoiceControls';
 import AudioPlayer from '../../components/AudioPlayer';
 import InputModeToggle from '../../components/InputModelToggle';
-import StatusBar from '../../components/StatusBar';
+// import StatusBar from '../../components/StatusBar';
 import TextInputSection from '../../components/TextInputSection';
 import { motion } from 'framer-motion';
 
@@ -75,7 +75,6 @@ function ExperimentChat() {
     }
   }, [sessionId]);
 
-
   const connectWebSocket = () => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       console.log('WebSocket이 이미 연결되어 있습니다.');
@@ -106,10 +105,17 @@ function ExperimentChat() {
       console.log('WebSocket 메시지 수신:', data);
       setIsTyping(false);
     
-      if (data.answer) {
-        setMessages((prev) => [...prev, { sender: 'ai', text: data.answer }]);
+      // 다양한 응답 필드 확인 (answer, message, response 등)
+      const responseText = data.answer || data.message || data.response || data.text;
+      
+      if (responseText) {
+        setMessages((prev) => [...prev, { sender: 'ai', text: responseText }]);
       } 
+      // else if (data.error) {
+      //   setMessages((prev) => [...prev, { sender: 'ai', text: `⚠️ 서버 오류: ${data.error}` }]);
+      // }
       else {
+        console.warn('알 수 없는 응답 구조:', data);
         setMessages((prev) => [...prev, { sender: 'ai', text: '[알 수 없는 응답]' }]);
       }
       
@@ -354,17 +360,29 @@ function ExperimentChat() {
     
     // WebSocket이 연결되어 있으면 WebSocket 사용
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      // manual_id 처리 - null 대신 빈 문자열 또는 실제 값 사용
-      const manualId = typeof experimentDetails.manual === 'string' 
-        ? experimentDetails.manual 
-        : (experimentDetails.manual?.manual_id || experimentDetails.manual?.id || '');
+      // manual_id 처리 - 음성 처리와 동일한 로직 사용
+      const manualId = experimentDetails.manual?.manual_id || 
+                      experimentDetails.manual?.id || 
+                      (typeof experimentDetails.manual === 'string' ? experimentDetails.manual : null);
+      
+      console.log('manual_id 처리 과정:', {
+        'experimentDetails.manual': experimentDetails.manual,
+        'typeof experimentDetails.manual': typeof experimentDetails.manual,
+        'manual_id 계산 결과': manualId,
+        'manual_id가 null인가': manualId === null,
+        'experimentDetails 전체': experimentDetails
+      });
       
       const messageData = {
         message: userMessage,
-        manual_id: manualId,
         user_id: userInfo?.id || userInfo?.user_id || "4",
         session_id: sessionId || ''
       };
+      
+      // manual_id가 있을 때만 추가 (음성 처리와 동일)
+      if (manualId) {
+        messageData.manual_id = manualId;
+      }
       
       console.log('WebSocket 메시지 전송:', messageData);
       console.log('실험 매뉴얼 정보:', experimentDetails.manual);
@@ -378,13 +396,11 @@ function ExperimentChat() {
         console.error('HTTP 채팅 에러:', error);
         setMessages((prev) => [...prev, { sender: 'bot', text: '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' }]);
         setStatusText('네트워크 오류');
+        setIsTyping(false);
       }
     }
-    
-    setIsTyping(false);
   };
   
-
   const handleMicClick = async () => {
     // 녹음 시작만 담당
     if (isRecording) return; // 이미 녹음 중이면 무시
@@ -492,10 +508,11 @@ function ExperimentChat() {
         const data = await response.json();
         console.log('음성 응답 수신:', data);
         
+        // 사용자 메시지(STT 결과)와 AI 응답을 함께 추가
         setMessages((prev) => [
           ...prev,
-          { sender: 'user', text: data.input_text || '[음성 입력]' },
-          { sender: 'bot', text: data.response_text || '음성이 처리되었습니다.' },
+          { sender: 'user', text: data.input_text || '[음성 인식 실패]' },
+          { sender: 'assistant', text: data.output_text || data.response_text || '음성이 처리되었습니다.', audio_url: data.audio_url }
         ]);
         
         if (data.audio_url) {
@@ -546,7 +563,7 @@ function ExperimentChat() {
           
         <p className="text-[#7B87B8] text-base text-left mb-8">
           실험 중 음성 또는 텍스트로 로그를 남기거나 질문할 수 있습니다. <br />
-          음성 입력 필요 시 "랩가드야"라고 부른 후 내용을 말해주세요. <br />
+          {/* 음성 입력 필요 시 "랩가드야"라고 부른 후 내용을 말해주세요. <br /> */}
           남긴 실험 로그를 바탕으로 리포트가 자동 생성됩니다.
         </p>
 
@@ -599,7 +616,7 @@ function ExperimentChat() {
         />
 
         {/* 상태 표시 */}
-        <StatusBar statusText={statusText} />
+        {/* <StatusBar statusText={statusText} /> */}
 
         {/* 텍스트 입력 섹션 */}
         {mode === 'text' && (
