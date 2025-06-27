@@ -75,6 +75,7 @@ function ExperimentChat() {
     }
   }, [sessionId]);
 
+
   const connectWebSocket = () => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       console.log('WebSocket이 이미 연결되어 있습니다.');
@@ -111,9 +112,6 @@ function ExperimentChat() {
       if (responseText) {
         setMessages((prev) => [...prev, { sender: 'ai', text: responseText }]);
       } 
-      // else if (data.error) {
-      //   setMessages((prev) => [...prev, { sender: 'ai', text: `⚠️ 서버 오류: ${data.error}` }]);
-      // }
       else {
         console.warn('알 수 없는 응답 구조:', data);
         setMessages((prev) => [...prev, { sender: 'ai', text: '[알 수 없는 응답]' }]);
@@ -273,8 +271,6 @@ function ExperimentChat() {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
-
-
 
   useEffect(() => {
     // URL에서 sessionId 파라미터 또는 location.state에서 session_id 가져오기
