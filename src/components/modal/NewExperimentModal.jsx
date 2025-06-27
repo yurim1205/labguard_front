@@ -114,13 +114,49 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
 
       // session_id는 채팅을 위해 여전히 생성할 수 있음
       const sessionId = uuidv4();
+
+
+
+//////////////////////브리핑//////////////////////
+
+
+      // 브리핑 생성 API 호출
+      console.log('🎯 브리핑 생성 중...');
+      let briefingData = null;
+      
+      try {
+        const briefingResponse = await fetch('/api/briefing/generate', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            manual_id: selectedManual,
+            user_id: currentUserId
+          }),
+        });
+
+        if (briefingResponse.ok) {
+          briefingData = await briefingResponse.json();
+          console.log('🎯 브리핑 생성 성공:', briefingData);
+        } else {
+          console.error('🎯 브리핑 생성 실패:', briefingResponse.status);
+        }
+      } catch (briefingError) {
+        console.error('🎯 브리핑 생성 에러:', briefingError);
+      }
   
+
+
+      //////////////////////브리핑 끝//////////////////////
       // 백엔드에서 반환받은 세션 ID로 실험 채팅 페이지로 이동
       console.log('실험 채팅 페이지로 이동:', {
         experiment_id,
         experiment_title,
         manual: selectedManualData || selectedManual,
         session_id: sessionId,
+        briefing: briefingData,
       });
       
       navigate(`/ExperimentChat/session/${sessionId}`, {
@@ -129,6 +165,9 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
           experiment_title,
           manual: selectedManualData || selectedManual,
           session_id: sessionId,
+          // 브리핑 데이터 추가 - play_url을 audio_url로 전달
+          summary: briefingData?.summary || '',
+          audio_url: briefingData?.play_url || null,
         },
       });
   
