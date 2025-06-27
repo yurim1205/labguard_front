@@ -99,6 +99,7 @@ function Login() {
             const userData = await userResponse.json();
             console.log("User data received:", userData);
             
+            // 로그인 처리 (자동 토큰 갱신 시작됨)
             useAuthStore.getState().login({
               id: userData.id || userData.user_id,
               name: userData.name || form.email,
@@ -125,7 +126,7 @@ function Login() {
       } catch (error) {
         console.error("User data fetch error:", error);
         useAuthStore.getState().login({
-          id: 1, // 기본값
+          id: 1,
           name: form.email,
           email: form.email,
           company_id: 1,
