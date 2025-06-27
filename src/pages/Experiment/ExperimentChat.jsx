@@ -37,15 +37,15 @@ function ExperimentChat() {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioStream, setAudioStream] = useState(null);
 
-  const [sessionId, setSessionId] = useState(() => {
-    return location.state?.session_id || sessionStorage.getItem("session_id") || null;
+  const [experimentId, setExperimentId] = useState(() => {
+    return location.state?.experiment_id || sessionStorage.getItem("experiment_id") || null;
   });
 
   const loadChatLogFromDB = async () => {
-    if (!sessionId) return;
+    if (!experimentId) return;
 
     try {
-      const res = await fetch(`/api/chat/continue/${sessionId}`, {
+      const res = await fetch(`/api/chat/continue/${experimentId}`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -69,11 +69,11 @@ function ExperimentChat() {
   };
 
   useEffect(() => {
-    if (sessionId) {
-      sessionStorage.setItem("session_id", sessionId);
+    if (experimentId) {
+      sessionStorage.setItem("experiment_id", experimentId);
       loadChatLogFromDB();
     }
-  }, [sessionId]);
+  }, [experimentId]);
 
 
   const connectWebSocket = () => {
@@ -92,7 +92,7 @@ function ExperimentChat() {
       // 실험 정보를 서버로 전송
       const experimentInfo = {
         type: 'experiment_info',
-        session_id: sessionId,
+        experiment_id: experimentId,
         experiment_title: experimentDetails.experiment_title,
         manual: experimentDetails.manual,
         timestamp: new Date().toISOString()
@@ -176,12 +176,12 @@ function ExperimentChat() {
       }
       
       useEffect(() => {
-        const sessionId = location.state?.session_id;
-        if (!sessionId) return;
+        const experimentId = location.state?.experiment_id;
+        if (!experimentId) return;
       
         const loadPreviousChat = async () => {
           try {
-            const res = await fetch(`/api/session/${sessionId}`, {
+            const res = await fetch(`/api/experiment/${experimentId}`, {
               method: 'GET',
               credentials: 'include'
             });
@@ -346,7 +346,7 @@ function ExperimentChat() {
         socketRef.current.close();
       }
     };
-  }, []);  
+  }, []);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -355,28 +355,28 @@ function ExperimentChat() {
   }, [messages]);
 
   useEffect(() => {
-    // URL에서 sessionId 파라미터 또는 location.state에서 session_id 가져오기
-    const sessionId = params.sessionId || location.state?.session_id;
+    // URL에서 experimentId 파라미터 또는 location.state에서 experiment_id 가져오기
+    const experimentId = params.experimentId || location.state?.experiment_id;
     
-    if (!sessionId) {
-      console.log('세션 ID가 없습니다. 새로운 실험을 시작합니다.');
+    if (!experimentId) {
+      console.log('실험 ID가 없습니다. 새로운 실험을 시작합니다.');
       return;
     }
     
-    console.log('세션 기록 로드 시도:', sessionId);
+    console.log('실험 기록 로드 시도:', experimentId);
   
         const loadPreviousChat = async () => {
       try {
-        console.log('세션 정보 로드 시도:', sessionId);
+        console.log('실험 정보 로드 시도:', experimentId);
         
-        const res = await fetch(`/api/experiment/session/${sessionId}`, {
+        const res = await fetch(`/api/experiment/experiment/${experimentId}`, {
           method: 'GET',
           credentials: 'include'
         });
 
         if (res.ok) {
           const experimentData = await res.json();
-          console.log("세션 정보 로드 성공:", experimentData);
+          console.log("실험 정보 로드 성공:", experimentData);
           
           // 실험 정보 업데이트 (location.state의 최신 데이터를 우선 사용)
           setExperimentDetails({
@@ -391,11 +391,11 @@ function ExperimentChat() {
               text: `안녕하세요! "${experimentData.title || experimentData.experiment_title || '실험'}" 실험에 오신 것을 환영합니다! 🧑‍🔬\n\n실험에 대해 궁금한 점이 있으시면 언제든 질문해주세요!`
             }
           ]);
-          console.log("세션 복원 완료 - 실험 정보 로드됨");
+          console.log("실험 복원 완료 - 실험 정보 로드됨");
           
         } else if (res.status === 404) {
-          console.warn("세션을 찾을 수 없습니다. 새로운 실험을 시작합니다.");
-          // 세션이 없으면 기본 환영 메시지 표시
+          console.warn("실험을 찾을 수 없습니다. 새로운 실험을 시작합니다.");
+          // 실험이 없으면 기본 환영 메시지 표시
           setMessages([
             { 
               sender: 'bot', 
@@ -403,7 +403,7 @@ function ExperimentChat() {
             }
           ]);
         } else {
-          console.warn("세션 정보 불러오기 실패:", res.status);
+          console.warn("실험 정보 불러오기 실패:", res.status);
           // API 실패 시에도 환영 메시지 표시
           setMessages([
             { 
@@ -413,7 +413,7 @@ function ExperimentChat() {
           ]);
         }
       } catch (err) {
-        console.error("세션 로드 중 에러:", err);
+        console.error("실험 로드 중 에러:", err);
         // 에러 시에도 환영 메시지 표시
         setMessages([
           { 
@@ -425,7 +425,7 @@ function ExperimentChat() {
     };
   
     loadPreviousChat();
-  }, [params.sessionId, location.state?.session_id]);
+  }, [params.experimentId, location.state?.experiment_id]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -454,7 +454,7 @@ function ExperimentChat() {
       const messageData = {
         message: userMessage,
         user_id: userInfo?.id || userInfo?.user_id || "4",
-        session_id: sessionId || ''
+        experiment_id: experimentId || ''
       };
       
       // manual_id가 있을 때만 추가 (음성 처리와 동일)
@@ -544,7 +544,7 @@ function ExperimentChat() {
     try {
       console.log('음성 파일 전송 중...', {
         blobSize: blob.size,
-        sessionId: sessionId,
+        experimentId: experimentId,
         userId: userInfo?.id || userInfo?.user_id,
         manualId: experimentDetails.manual?.manual_id
       });
@@ -553,7 +553,7 @@ function ExperimentChat() {
       
       const formData = new FormData();
       formData.append('audio', blob, 'audio.wav');
-      formData.append('session_id', sessionId || '');
+      formData.append('experiment_id', experimentId || '');
       
       // manual_id 처리 - 빈 문자열 대신 null 또는 실제 값 전송
       const manualId = experimentDetails.manual?.manual_id || 
@@ -569,7 +569,7 @@ function ExperimentChat() {
                       // FormData 내용 확인
                       console.log('전송할 데이터:', {
                         audioSize: blob.size,
-                        sessionId: sessionId || '',
+                        experimentId: experimentId || '',
                         manualId: manualId,
                         userId: userInfo?.id || userInfo?.user_id || '',
                         experimentDetails: experimentDetails,
