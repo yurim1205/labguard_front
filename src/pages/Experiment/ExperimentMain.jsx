@@ -27,7 +27,7 @@ function ExperimentMain() {
     {
       name: '수소/산소 발생 전극의 열화 대응 소재 발굴 실험 매뉴얼',
       date: '25/05/26 18:02:36',
-      completed: true,
+      completed: false,
     },
   ];
 
