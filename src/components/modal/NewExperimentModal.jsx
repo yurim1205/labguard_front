@@ -75,6 +75,8 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
         experiment_date: new Date().toISOString().slice(0, 10),
       };
       
+      console.log('실험 생성 요청 데이터:', requestData);
+      
       const response = await fetch('/api/experiment', {
         method: 'POST',
         credentials: 'include',
@@ -106,14 +108,14 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
       }
   
       const data = await response.json();
+      console.log('실험 생성 응답:', data);
+      
       const experiment_id = data.experiment_id;
   
       const selectedManualData = manuals.find(
         (manual) => manual.manual_id === parseInt(selectedManual)
       );
 
-      // session_id는 채팅을 위해 여전히 생성할 수 있음
-      const sessionId = uuidv4();
 
 
 
@@ -155,16 +157,15 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
         experiment_id,
         experiment_title,
         manual: selectedManualData || selectedManual,
-        session_id: sessionId,
         briefing: briefingData,
       });
       
-      navigate(`/ExperimentChat/session/${sessionId}`, {
+      // 라우팅 경로를 experiment_id 기반으로 변경
+      navigate(`/ExperimentChat/experiment/${experiment_id}`, {
         state: {
           experiment_id,
           experiment_title,
           manual: selectedManualData || selectedManual,
-          session_id: sessionId,
           // 브리핑 데이터 추가 - play_url을 audio_url로 전달
           summary: briefingData?.summary || '',
           audio_url: briefingData?.play_url || null,
