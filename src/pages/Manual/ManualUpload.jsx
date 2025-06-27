@@ -28,7 +28,7 @@ function ManualUpload() {
     try {
       console.log('📋 매뉴얼 목록 API 호출 시작...');
       
-      const response = await fetch('http://localhost:8000/manuals/', {
+      const response = await fetch('/api/manuals/', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -41,7 +41,7 @@ function ManualUpload() {
       if (!response.ok) {
         if (response.status === 401) {
           console.log('🔐 인증 오류 - 로그인 필요');
-          navigate('/login');
+          setManualsError('로그인이 필요하거나 세션이 만료되었습니다.');
           return;
         }
         throw new Error(`매뉴얼 목록 조회 실패: HTTP ${response.status}`);
@@ -97,7 +97,7 @@ function ManualUpload() {
     console.log('📖 매뉴얼 클릭:', manual_id);
     navigate('/ManualRead', { 
       state: { 
-        manualId: manual_id 
+        manual_id: manual_id 
       } 
     });
   };
@@ -125,7 +125,7 @@ function ManualUpload() {
         size: selectedFile.size
       });
 
-      const uploadResponse = await fetch('http://localhost:8000/manuals/upload', {
+      const uploadResponse = await fetch('/api/manuals/upload', {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -136,10 +136,20 @@ function ManualUpload() {
       if (!uploadResponse.ok) {
         let errorMessage = `업로드 실패: HTTP ${uploadResponse.status}`;
         
+        // 응답 텍스트 전체를 먼저 읽어 보기
+        let responseText = '';
         try {
-          const errorData = await uploadResponse.json();
+          responseText = await uploadResponse.text();
+          console.error('서버 에러 응답 원문:', responseText);
+        } catch (textError) {
+          console.error('응답 텍스트 읽기 실패:', textError);
+        }
+        
+        try {
+          // JSON 파싱 시도
+          const errorData = responseText ? JSON.parse(responseText) : {};
           console.error('업로드 에러 상세:', errorData);
-          errorMessage = errorData.detail || errorMessage;
+          errorMessage = errorData.detail || errorData.message || errorMessage;
           
           // 401 인증 오류 처리
           if (uploadResponse.status === 401) {
@@ -148,13 +158,24 @@ function ManualUpload() {
             return;
           }
         } catch (jsonError) {
-          console.error('에러 응답 파싱 실패:', jsonError);
+          console.error('에러 응답 JSON 파싱 실패:', jsonError);
+          
+          // 상태 코드별 에러 메시지 개선
           if (uploadResponse.status === 500) {
-            errorMessage = '서버 내부 오류가 발생했습니다. 데이터베이스 연결을 확인해주세요.';
+            errorMessage = '서버 내부 오류가 발생했습니다.\n\n가능한 원인:\n• 데이터베이스 연결 문제\n• 파일 처리 오류\n• 서버 리소스 부족\n\n시스템 관리자에게 문의해주세요.';
+            console.error('500 에러 - 서버 응답:', responseText);
           } else if (uploadResponse.status === 401) {
             alert('로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.');
             navigate('/login');
             return;
+          } else if (uploadResponse.status === 413) {
+            errorMessage = '파일 크기가 너무 큽니다. 30MB 이하의 파일을 업로드해주세요.';
+          } else if (uploadResponse.status === 415) {
+            errorMessage = '지원하지 않는 파일 형식입니다. PDF 파일만 업로드 가능합니다.';
+          } else if (uploadResponse.status >= 500) {
+            errorMessage = `서버 오류가 발생했습니다 (${uploadResponse.status}). 잠시 후 다시 시도해주세요.`;
+          } else if (uploadResponse.status >= 400) {
+            errorMessage = `요청 오류가 발생했습니다 (${uploadResponse.status}). 파일과 입력값을 확인해주세요.`;
           }
         }
         
@@ -304,34 +325,31 @@ function ManualUpload() {
           {/* 업로드된 매뉴얼 목록 (filename과 uploaded_at만 표시) */}
           {!manualsLoading && uploadedManuals.length > 0 && (
             <div className="space-y-4">
-              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-800 font-medium">✅ {uploadedManuals.length}개의 매뉴얼이 등록되어 있습니다.</p>
-              </div>
               {uploadedManuals.map((manual, index) => (
                 <div 
                   key={manual.manual_id || index} 
                   onClick={() => handleManualClick(manual.manual_id)}
                   className="bg-white border border-[#b5b5b5] rounded-[10px] overflow-hidden cursor-pointer hover:bg-gray-50 hover:border-[#0E467B] transition-all duration-200 hover:shadow-md"
                 >
-                  <div className="flex items-center justify-between px-8 py-6">
-                    <div className="flex items-center gap-4">
-                      <img src={equipment} alt="equipment" className="w-[28px] h-[28px]" />
-                      <div className="flex flex-col">
-                        <span className="text-[#33308B] font-semibold text-[1.05rem] hover:text-[#0E467B]">
-                          {manual.filename || manual.title}
-                        </span>
-                        <span className="text-xs text-gray-500 mt-1">
-                          상태: {manual.status} | ID: {manual.manual_id}
-                        </span>
+                  <div className="flex items-center justify-between px-8 py-8 min-h-[60px]">
+                                          <div className="flex items-center gap-4">
+                        <img src={equipment} alt="equipment" className="w-[28px] h-[28px]" />
+                        <div className="flex flex-col py-1">
+                          <span className="text-[#33308B] font-semibold text-[1.1rem] hover:text-[#0E467B] leading-relaxed">
+                            {manual.filename || manual.title}
+                          </span>
+                          {/* <span className="text-xs text-gray-500 mt-1">
+                            상태: {manual.status} | ID: {manual.manual_id}
+                          </span> */}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-[#33308B] text-[0.95rem]">
-                        {new Date(manual.uploaded_at).toLocaleString('ko-KR')}
-                      </div>
-                      <div className="text-gray-400 text-sm">
+                                          <div className="flex items-center gap-2 py-1">
+                        <div className="text-[#33308B] text-[0.95rem] leading-relaxed">
+                          {new Date(manual.uploaded_at).toLocaleString('ko-KR')}
+                        </div>
+                      {/* <div className="text-gray-400 text-sm">
                         👆 클릭하여 읽기
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>

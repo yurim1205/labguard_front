@@ -59,11 +59,27 @@ function Login() {
       });
 
       if (!response.ok) {
-        const errData = await response.json();
+        let errorMessage = "로그인 실패";
+        
+        try {
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const errData = await response.json();
+            errorMessage = errData.detail || "로그인 실패";
+          } else {
+            const errorText = await response.text();
+            console.error("Server error:", errorText);
+            errorMessage = `서버 오류 (${response.status})`;
+          }
+        } catch (parseError) {
+          console.error("Error parsing response:", parseError);
+          errorMessage = `서버 응답 오류 (${response.status})`;
+        }
+        
         if (response.status === 401) {
           throw new Error("회원정보가 없습니다. 회원가입을 먼저 진행해주세요.");
         } else {
-          throw new Error(errData.detail || "로그인 실패");
+          throw new Error(errorMessage);
         }
       }
 
@@ -71,28 +87,46 @@ function Login() {
       console.log("Login response:", data);
 
       try {
+        // 사용자 정보 조회
         const userResponse = await fetch("/api/user/me", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          credentials: "include"
         });
-
+        
         if (userResponse.ok) {
-          const userData = await userResponse.json();
-          useAuthStore.getState().login({
-            name: userData.name || form.email,
-            email: userData.email || form.email,
-            company_id: userData.company_id,
-          });
+          try {
+            const userData = await userResponse.json();
+            console.log("User data received:", userData);
+            
+            // 로그인 처리 (자동 토큰 갱신 시작됨)
+            useAuthStore.getState().login({
+              id: userData.id || userData.user_id,
+              name: userData.name || form.email,
+              email: userData.email || form.email,
+              company_id: userData.company_id,
+            });
+          } catch (parseError) {
+            console.error("Error parsing user data:", parseError);
+            useAuthStore.getState().login({
+              name: form.email,
+              email: form.email,
+              company_id: 1,
+            });
+          }
         } else {
+          console.log("User data fetch failed, using form data");
           useAuthStore.getState().login({
+            id: 1,
             name: form.email,
             email: form.email,
             company_id: 1,
           });
         }
-      } catch {
+      } catch (error) {
+        console.error("User data fetch error:", error);
         useAuthStore.getState().login({
+          id: 1,
           name: form.email,
           email: form.email,
           company_id: 1,
