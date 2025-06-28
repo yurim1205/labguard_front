@@ -19,7 +19,7 @@ const AudioPlayer = ({ url }) => {
       ref={audioRef}
       controls
       src={resolvedUrl}
-      style={{ width: '100%' }}
+      style={{ display: 'none' }}
     >
       브라우저가 오디오 태그를 지원하지 않습니다.
     </audio>
