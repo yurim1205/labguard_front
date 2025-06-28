@@ -8,6 +8,8 @@ import InputModeToggle from '../../components/InputModelToggle';
 // import StatusBar from '../../components/StatusBar';
 import TextInputSection from '../../components/TextInputSection';
 import { motion } from 'framer-motion';
+import ReportTypeModal from '../../components/modal/ReportTypeModal';
+import ExperimentEndBtn from '../../components/button/experimentEndBtn';
 
 
 function ExperimentChat() {
@@ -40,6 +42,9 @@ function ExperimentChat() {
   const [experimentId, setExperimentId] = useState(() => {
     return location.state?.experiment_id || sessionStorage.getItem("experiment_id") || null;
   });
+
+  // 모달 상태
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const loadChatLogFromDB = async () => {
     if (!experimentId) return;
@@ -647,17 +652,67 @@ function ExperimentChat() {
 
   const handleInputChange = (e) => setInput(e.target.value);
 
+  // 실험 종료 버튼 클릭 핸들러
+  const handleExperimentEndClick = () => {
+    // 실험 데이터 준비
+    const experimentData = {
+      experiment_id: experimentId,
+      experiment_title: experimentDetails.experiment_title,
+      manual_id: experimentDetails.manual?.manual_id || experimentDetails.manual?.id || experimentDetails.manual,
+      messages: messages,
+      start_time: experimentStartTime,
+      end_time: new Date().toISOString()
+    };
+
+    // ExperimentEnd 페이지로 이동하면서 데이터 전달
+    navigate('/experiment/end', {
+      state: {
+        experimentData: experimentData
+      }
+    });
+  };
+
+  // 리포트 유형 선택 핸들러
+  const handleReportTypeSelect = (type) => {
+    console.log('선택된 리포트 유형:', type);
+
+    // 실험 데이터 준비
+    const experimentData = {
+      experiment_id: experimentId,
+      experiment_title: experimentDetails.experiment_title,
+      manual_id: experimentDetails.manual?.manual_id || experimentDetails.manual?.id || experimentDetails.manual,
+      report_type: type,
+      messages: messages,
+      start_time: experimentStartTime,
+      end_time: new Date().toISOString()
+    };
+
+    // ReportRead 페이지로 이동하면서 데이터 전달
+    navigate('/report/read', {
+      state: {
+        experimentData: experimentData,
+        reportType: type
+      }
+    });
+  };
+
   return (
     <>
       <Header />
       <div className="max-w-[1200px] mx-auto pt-10 pb-12">
-        <h1 className="text-[2.3rem] font-black mb-[20px] text-left">
-          {experimentDetails.experiment_title}
-        </h1>
+        <div className="flex justify-between items-center mb-[20px]">
+          <h1 className="text-[2.3rem] font-black text-left">
+            {experimentDetails.experiment_title}
+          </h1>
+
+          {/* 실험 종료 버튼 */}
+          <ExperimentEndBtn
+            onClick={handleExperimentEndClick}
+          />
+        </div>
 
         <p className="text-[#7B87B8] text-base text-left mb-8">
           실험 중 음성 또는 텍스트로 로그를 남기거나 질문할 수 있습니다. <br />
-          {/* 음성 입력 필요 시 "랩가드야"라고 부른 후 내용을 말해주세요. <br /> */}
           남긴 실험 로그를 바탕으로 리포트가 자동 생성됩니다.
         </p>
 
@@ -735,6 +790,13 @@ function ExperimentChat() {
         {/* 오디오 플레이어 */}
         {audioUrl && <AudioPlayer url={audioUrl} />}
       </div>
+
+      {/* 리포트 유형 선택 모달 */}
+      <ReportTypeModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        onSelectType={handleReportTypeSelect}
+      />
     </>
   );
 }
