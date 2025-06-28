@@ -1,16 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import Cookies from 'js-cookie';
 import { useAuthStore } from '../../store/useAuthStore';
 
 function ExperimentContinue() {
-  const fileInputRef = useRef();
   const navigate = useNavigate();
   const [experiments, setExperiments] = useState([]);
-  const [activeTab, setActiveTab] = useState('ongoing');
   const [loading, setLoading] = useState(true);
-  
+
   // 쿠키 또는 전역 상태에서 사용자 ID 가져오기
   const currentUser = useAuthStore((state) => state.user);
   const userId = currentUser?.id || currentUser?.user_id || Cookies.get('user_id');
@@ -18,7 +16,7 @@ function ExperimentContinue() {
   useEffect(() => {
     const checkAuthAndFetch = async () => {
       let currentUserId = userId;
-      
+
       // 사용자 ID가 없으면 인증 상태 확인
       if (!currentUserId) {
         try {
@@ -33,7 +31,7 @@ function ExperimentContinue() {
           if (response.ok) {
             const userData = await response.json();
             console.log('현재 인증된 사용자:', userData);
-            
+
             // 전역 상태 업데이트
             useAuthStore.getState().login({
               id: userData.id || userData.user_id,
@@ -41,7 +39,7 @@ function ExperimentContinue() {
               email: userData.email,
               company_id: userData.company_id,
             });
-            
+
             currentUserId = userData.id || userData.user_id;
           } else if (response.status === 401) {
             console.log('인증되지 않은 사용자 - 로그인 페이지로 이동');
@@ -53,25 +51,25 @@ function ExperimentContinue() {
           console.error('인증 상태 확인 실패:', error);
         }
       }
-      
+
       if (!currentUserId) {
         console.error('사용자 ID를 찾을 수 없습니다.');
         setLoading(false);
         return;
       }
-      
+
       // 실험 목록 조회
       try {
         setLoading(true);
         console.log('사용자 실험 목록 조회 시작, User ID:', currentUserId);
-        
+
         const res = await fetch(`/api/experiment/user/${currentUserId}`, {
           method: 'GET',
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
-        });        
+        });
 
         if (res.ok) {
           const data = await res.json();
@@ -104,7 +102,6 @@ function ExperimentContinue() {
         experiment_id: experiment.experiment_id,
         experiment_title: experiment.title,
         manual: experiment.manual_id,
-        experiment_id: experiment.experiment_id,
       },
     });
   };
@@ -140,7 +137,7 @@ function ExperimentContinue() {
                     <span className="text-[#33308B] font-semibold">{exp.title}</span>
                   </div>
 
-                  <span 
+                  <span
                     onClick={() => handleContinueExperiment(exp)}
                     className="text-[#1C1C59] text-[0.95rem] underline cursor-pointer hover:text-[#33308B] mr-[10px]"
                   >
