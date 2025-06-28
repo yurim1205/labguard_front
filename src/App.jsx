@@ -9,7 +9,6 @@ import RiskAnalyzeResult from './pages/Manual/RiskAnalyzeResult';
 import ExperimentMain from './pages/Experiment/ExperimentMain';
 import ExperimentChat from './pages/Experiment/ExperimentChat';
 import ExperimentContinue from './pages/Experiment/ExperimentContinue';
-import ExperimentEnd from './pages/Experiment/ExperimentEnd';
 
 import ReportMain from './pages/Report/ReportMain';
 import ReportRead from './pages/Report/ReportRead';
@@ -33,11 +32,9 @@ function App() {
         <Route path="/ExperimentChat/:experimentId" element={<ExperimentChat />} />
         <Route path="/ExperimentChat/experiment/:experimentId" element={<ExperimentChat />} />
         <Route path="/ExperimentContinue" element={<ExperimentContinue />} />
-        <Route path="/experiment/end" element={<ExperimentEnd />} />
 
         <Route path="/ReportMain" element={<ReportMain />} />
         <Route path="/ReportRead" element={<ReportRead />} />
-        <Route path="/report/read" element={<ReportRead />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
     </Router>
