@@ -23,7 +23,9 @@ const AudioPlayer = ({ url }) => {
       key={resolvedUrl}
       ref={audioRef}
       src={resolvedUrl}
-      style={{ display: 'none' }} // 플레이어 UI 숨기기
+
+
+      style={{ display: 'none' }}
     >
       브라우저가 오디오 태그를 지원하지 않습니다.
     </audio>
