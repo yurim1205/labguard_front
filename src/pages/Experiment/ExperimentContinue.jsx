@@ -113,7 +113,7 @@ function ExperimentContinue() {
       <Header />
       <div className="max-w-[1200px] mx-auto pt-10 pb-12">
         <h1 className="text-[2.3rem] font-black mb-[60px] text-left tracking-tight">실험</h1>
-        <h2 className="text-[20px] font-bold text-left font-[600] mb-0">실험 이어하기</h2>
+        <h2 className="text-[20px] font-bold text-left font-[600] mb-0">내 실험 목록</h2>
 
         <section className="mt-[18px]">
           {loading ? (
