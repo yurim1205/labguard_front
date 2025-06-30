@@ -104,7 +104,6 @@ function ExperimentContinue() {
         experiment_id: experiment.experiment_id,
         experiment_title: experiment.title,
         manual: experiment.manual_id,
-        experiment_id: experiment.experiment_id,
       },
     });
   };
