@@ -42,23 +42,21 @@ export const useAuthStore = create((set, get) => ({
   // 토큰 갱신 함수
   refreshToken: async () => {
     try {
-      console.log("토큰 갱신 시도...");
-      
       const response = await fetch("/api/user/refresh", {
         method: "POST",
         credentials: "include"
       });
       
       if (response.ok) {
-        console.log("토큰 갱신 성공");
+        console.log("Token refreshed successfully");
         return true;
       } else {
-        console.error("토큰 갱신 실패:", response.status);
+        console.error("Token refresh failed");
         get().logout();
         return false;
       }
     } catch (error) {
-      console.error("토큰 갱신 오류:", error);
+      console.error("Token refresh error:", error);
       get().logout();
       return false;
     }
@@ -73,13 +71,10 @@ export const useAuthStore = create((set, get) => ({
       clearInterval(refreshTimer);
     }
     
-    console.log("자동 토큰 갱신 시작 (12분마다)");
-    
-    // 12분마다 토큰 갱신 (access token이 15분이므로 3분 여유)
+    // 14분마다 토큰 갱신 (access token이 15분이므로 1분 여유)
     const timer = setInterval(() => {
-      console.log("토큰 갱신 스케줄 실행");
       get().refreshToken();
-    }, 12 * 60 * 1000); // 12분
+    }, 14 * 60 * 1000);
     
     set({ refreshTimer: timer });
   },
@@ -88,34 +83,5 @@ export const useAuthStore = create((set, get) => ({
   handleTokenExpiry: async () => {
     const success = await get().refreshToken();
     return success;
-  },
-  
-  // 페이지 로드 시 로그인 상태 확인
-  checkAuthStatus: async () => {
-    try {
-      const response = await fetch("/api/user/me", {
-        method: "GET",
-        credentials: "include"
-      });
-      
-      if (response.ok) {
-        const userData = await response.json();
-        console.log("기존 로그인 상태 확인됨:", userData);
-        
-        set({ 
-          isLoggedIn: true, 
-          user: userData
-        });
-        
-        get().startTokenRefresh();
-        return true;
-      } else {
-        console.log("로그인되지 않은 상태");
-        return false;
-      }
-    } catch (error) {
-      console.error("로그인 상태 확인 오류:", error);
-      return false;
-    }
   }
 }));
