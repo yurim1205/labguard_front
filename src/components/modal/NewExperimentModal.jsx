@@ -141,7 +141,6 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
       } catch (briefingError) {
         console.error('🎯 브리핑 생성 에러:', briefingError);
       }
-  
 
 
       //////////////////////브리핑 끝//////////////////////
@@ -202,12 +201,15 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
           maxHeight: '90vh'
         }}
       >
-                <button
+        <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-[24px] h-[24px] flex items-center justify-center"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-[24px] h-[24px] mt-[9px] ml-[12px]
+          flex items-center justify-center border-none bg-transparent focus:outline-none hover:bg-[#E6EEFF]
+          cursor-pointer"
         >
           <img src={close} alt="close" className="w-[16px] h-[16px]" />
         </button>
+        
         <h2 className="text-[20px] font-extrabold text-center mb-0 font-[500]">
           새 실험 생성
         </h2>
