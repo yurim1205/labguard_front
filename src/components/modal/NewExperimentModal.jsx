@@ -141,7 +141,6 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
       } catch (briefingError) {
         console.error('🎯 브리핑 생성 에러:', briefingError);
       }
-  
 
 
       //////////////////////브리핑 끝//////////////////////
@@ -174,10 +173,19 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
   
   return (
     <div
-      className="fixed inset-0 z-[99999] bg-black bg-opacity-30"
-      style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
-      onClick={onClose}
-    >
+    className="fixed inset-0 z-[99999] bg-[#C4C2C2] bg-opacity-5 backdrop-blur-sm"
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      backgroundColor: 'rgba(0, 0, 0, 0.05)', // 5% 투명도
+      backdropFilter: 'blur(4px)', // blur 적용
+      zIndex: 99999
+    }}
+  >
+  
       {/* 모달 */}
       <div
         onClick={(e) => e.stopPropagation()}
@@ -193,12 +201,15 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
           maxHeight: '90vh'
         }}
       >
-                <button
+        <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-[24px] h-[24px] flex items-center justify-center"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-[24px] h-[24px] mt-[9px] ml-[12px]
+          flex items-center justify-center border-none bg-transparent focus:outline-none hover:bg-[#E6EEFF]
+          cursor-pointer"
         >
           <img src={close} alt="close" className="w-[16px] h-[16px]" />
         </button>
+        
         <h2 className="text-[20px] font-extrabold text-center mb-0 font-[500]">
           새 실험 생성
         </h2>
