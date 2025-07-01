@@ -18,21 +18,26 @@ function MenuCard({ img, title, desc, link }) {
   return (
     <Link
       to={link}
-      className="block bg-[#EBEAE5] w-[360px] h-[320px] rounded-[5px] p-10 hover:shadow-lg transition-shadow duration-200 no-underline"
+      className="block bg-white w-[360px] h-[320px] rounded-[5px] p-10 shadow-[0_12px_24px_0_rgba(128,128,128,0.36)] 
+                hover:shadow-[0_12px_24px_0_rgba(128,128,128,0.35)] 
+                hover:-translate-y-3 hover:scale-105 
+                transition ease-in-out duration-300 transform no-underline"
     >
-      <div className="flex flex-col items-center h-full justify-between gap-6">
-        <div
-          className="bg-[#FFFFFF] rounded-[5px] shadow-[0_6px_12px_0_rgba(128,128,128,0.28)] flex items-center justify-center mx-auto mb-6 mt-[12px]"
-          style={{ width: "320px", height: "160px" }}
-        >
-          <img src={img} alt={title} className="object-contain w-[96px] h-[96px]" />
-        </div>
-        <div className="pl-[12px] pr-[12px]">
-          <h3 className="text-xl font-bold mb-2 text-[#33308B]">{title}</h3>
-          <p className="text-gray-600 text-base mt-2">{desc}</p>
-        </div>
+
+    <div className="flex flex-col items-center h-full justify-between gap-6">
+      <div
+        className="bg-[#FFFFFF] rounded-[5px] flex items-center justify-center mx-auto mb-6 mt-[12px]"
+        style={{ width: "320px", height: "160px" }}
+      >
+        <img src={img} alt={title} className="object-contain w-[96px] h-[96px]" />
       </div>
-    </Link>
+      <div className="pl-[12px] pr-[12px] text-center">
+        <h3 className="text-xl font-bold mb-2 text-[#33308B]">{title}</h3>
+        <p className="text-gray-600 text-base mt-2">{desc}</p>
+      </div>
+    </div>
+  </Link>
+  
   );
 }
 

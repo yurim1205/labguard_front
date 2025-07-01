@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import Header from '../../components/Header';
 import NewExperimentModal from '../../components/modal/NewExperimentModal';
-import NewExperiment from '../../components/NewExperiment';
+import NewExperiment from '../../components/NewExperimentCard';
 import ExperimentContinueCard from '../../components/ExperimentContinueCard';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useAuthStore } from '../../store/useAuthStore';
+import leftArrow from '../../assets/img/leftArrow.png';
+import rightArrow from '../../assets/img/rightArrow.png';
 
 function ExperimentMain() {
   const fileInputRef = useRef();
@@ -134,90 +136,96 @@ function ExperimentMain() {
               <NewExperiment onClick={() => setIsModalOpen(true)} />
             </div>
             <div className="w-[360px]">
-              <ExperimentContinueCard />
+              <ExperimentContinueCard onClick={() => navigate('/ExperimentContinue')} />
             </div>
           </div>
         </section>
 
-        <section className="mt-[48px]">
-          <h2 className="text-[20px] font-bold mb-3 text-left font-[500]">내 실험</h2>
+        <section className="mt-[14px]">
+            <h2 className="text-[20px] font-bold mb-3 text-left font-[500]">내 실험</h2>
 
-          <div className="flex mb-0">
-            <button
-              onClick={() => setActiveTab('ongoing')}
-              className={`px-8 py-3 rounded-t-lg text-[16px] font-bold mr-1
-                ${activeTab === 'ongoing'
-                  ? 'bg-[#33308B] text-[#FFFFFF]'
-                  : 'bg-[#E6EEFF] text-[#1C1C59] border border-[#b5b5b5] border-b-0'}
-              `}
-            >
-              실험중
-            </button>
-            <button
-              onClick={() => setActiveTab('completed')}
-              className={`px-8 py-3 rounded-t-lg text-[16px] font-bold
-                ${activeTab === 'completed'
-                  ? 'bg-[#33308B] text-[#FFFFFF]'
-                  : 'bg-[#E6EEFF] text-[#1C1C59] border border-[#b5b5b5] border-b-0'}
-              `}
-            >
-              실험종료
-            </button>
-          </div>
+            <div className="flex mb-0">
+              <button
+                onClick={() => setActiveTab('ongoing')}
+                className={`px-8 py-3 rounded-t-[10px] text-[16px] font-bold mr-1
+                  ${activeTab === 'ongoing'
+                    ? 'bg-[#33308B] text-[#FFFFFF]'
+                    : 'bg-[#E6EEFF] text-[#1C1C59] border border-[#b5b5b5] border-b-0'}
+                `}
+              >
+                실험중
+              </button>
+              <button
+                onClick={() => setActiveTab('completed')}
+                className={`px-8 py-3 rounded-t-[10px] text-[16px] font-bold
+                  ${activeTab === 'completed'
+                    ? 'bg-[#33308B] text-[#FFFFFF]'
+                    : 'bg-[#E6EEFF] text-[#1C1C59] border border-[#b5b5b5] border-b-0'}
+                `}
+              >
+                실험종료
+              </button>
+            </div>
 
-          {isLoading ? (
-            <div className="bg-white border border-[#b5b5b5] rounded-[10px] py-8 text-center">
-              <p className="text-[#7B87B8]">실험 목록을 불러오는 중...</p>
-            </div>
-          ) : filteredExperiments.length === 0 ? (
-            <div className="bg-white border border-[#b5b5b5] rounded-[10px] py-8 text-center">
-              <p className="text-[#7B87B8] mb-2">표시할 실험이 없습니다.</p>
-            </div>
-          ) : (
-            <ul className="bg-white border border-[#b5b5b5] rounded-[10px] py-4 list-none mt-[1px]">
-              {paginatedExperiments.map((exp) => (
-                <li
-                  key={exp.experiment_id}
-                  className="flex items-center justify-between px-8 py-4 text-[1.05rem] border-b last:border-b-0"
-                >
-                  <div className="flex gap-8 items-center">
-                    <span className="text-[#ABBFBD] text-[0.95rem] px-[10px] py-[10px]">
-                      {new Date(exp.experiment_date).toLocaleDateString()}
-                    </span>
-                    <span className="text-[#33308B] font-semibold">{exp.title}</span>
-                  </div>
-                  <span
-                    onClick={() => handleContinue(exp)}
-                    className="text-[#1C1C59] text-[0.95rem] underline cursor-pointer hover:text-[#33308B] mr-[10px]"
+            {isLoading ? (
+              <div className="bg-white border border-[#b5b5b5] rounded-[10px] py-8 text-center mt-2">
+                <p className="text-[#7B87B8]">실험 목록을 불러오는 중...</p>
+              </div>
+            ) : filteredExperiments.length === 0 ? (
+              <div className="bg-white border border-[#b5b5b5] rounded-[10px] py-8 text-center mt-2">
+                <p className="text-[#7B87B8] mb-2">표시할 실험이 없습니다.</p>
+              </div>
+            ) : (
+              <>
+                <ul className="bg-white border border-[#b5b5b5] rounded-[10px] py-4 list-none mt-[-1px]">
+                  {paginatedExperiments.map((exp) => (
+                    <li
+                      key={exp.experiment_id}
+                      className="flex items-center justify-between px-8 py-4 text-[1.05rem] border-b last:border-b-0"
+                    >
+                      <div className="flex gap-8 items-center">
+                        <span className="text-[#ABBFBD] text-[0.95rem] px-[10px] py-[10px]">
+                          {new Date(exp.experiment_date).toLocaleDateString()}
+                        </span>
+                        <span className="text-[#33308B] font-semibold">{exp.title}</span>
+                      </div>
+                      <span
+                        onClick={() => handleContinue(exp)}
+                        className="text-[#1C1C59] text-[0.95rem] underline cursor-pointer hover:text-[#33308B] mr-[10px]"
+                      >
+                        {exp.completed ? '레포트 보기 >' : '실험 이어하기 >'}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex justify-center mt-4 gap-2">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="w-[30px] h-[30px] flex items-center justify-center 
+                              rounded-[6px] disabled:opacity-50 bg-[#CBD6EA]
+                              border-0 hover:bg-[#f0f0f0] transition focus:outline-none mr-[12px]"
                   >
-                    {exp.completed ? '레포트 보기 >' : '실험 이어하기 >'}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            
-          )}
-          <div className="flex justify-center mt-4 gap-2">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 border rounded disabled:opacity-50"
-            >
-              « 이전
-            </button>
-            <button
-              onClick={() =>
-                setCurrentPage((p) =>
-                  endIndex < filteredExperiments.length ? p + 1 : p
-                )
-              }
-              disabled={endIndex >= filteredExperiments.length}
-              className="px-4 py-2 border rounded disabled:opacity-50"
-            >
-              다음 »
-            </button>
-        </div>
-        </section>
+                    <img src={leftArrow} alt="이전" className="w-[16px] h-[16px]" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) =>
+                        endIndex < filteredExperiments.length ? p + 1 : p
+                      )
+                    }
+                    disabled={endIndex >= filteredExperiments.length}
+                    className="w-[30px] h-[30px] flex items-center justify-center 
+                              rounded-[6px] disabled:opacity-50 bg-[#CBD6EA]
+                              border-0 hover:bg-[#f0f0f0] transition focus:outline-none"
+                  >
+                    <img src={rightArrow} alt="다음" className="w-[16px] h-[16px]" />
+                  </button>
+                </div>
+              </>
+            )}
+          </section>
       </div>
     </>
   );

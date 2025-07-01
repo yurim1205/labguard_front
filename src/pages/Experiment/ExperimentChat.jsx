@@ -87,7 +87,7 @@ function ExperimentChat() {
   
     socketRef.current.onopen = () => {
       console.log('✅ WebSocket 연결 성공!');
-      setStatusText('텍스트 모드 활성화 - 채팅 준비 완료');
+      setStatusText('마이크 권한 요청을 허용해주세요!');
       
       // 실험 정보를 서버로 전송
       const experimentInfo = {
@@ -114,7 +114,6 @@ function ExperimentChat() {
       } 
       else {
         console.warn('알 수 없는 응답 구조:', data);
-        setMessages((prev) => [...prev, { sender: 'ai', text: '[알 수 없는 응답]' }]);
       }
       
       // TTS 오디오 URL이 있으면 설정
@@ -510,7 +509,7 @@ function ExperimentChat() {
       
       recorder.start();
       setIsRecording(true);
-      setStatusText('녹음 중... 녹음 중지 버튼을 눌러 완료하세요');
+      setStatusText('질문이 끝난 후 녹음을 중지해주세요!');
       
     } catch (error) {
       console.error('마이크 접근 실패:', error);
@@ -548,7 +547,7 @@ function ExperimentChat() {
         userId: userInfo?.id || userInfo?.user_id,
         manualId: experimentDetails.manual?.manual_id
       });
-      setStatusText('음성 처리 중...');
+      setStatusText('답변 생성 중...');
       setIsTyping(true);
       
       const formData = new FormData();
@@ -597,7 +596,7 @@ function ExperimentChat() {
           setAudioUrl(data.audio_url);
         }
         
-        setStatusText('음성 처리 완료');
+        setStatusText('답변 완료! 버튼을 눌러 질문 해주세요!');
         setAudioBlob(null);
       } else if (response.status === 401) {
         alert('로그인이 필요합니다. 다시 로그인해주세요.');
@@ -639,9 +638,8 @@ function ExperimentChat() {
           {experimentDetails.experiment_title}
         </h1>
           
-        <p className="text-[#7B87B8] text-base text-left mb-8">
+        <p className="text-[#33308B] text-base text-left mb-8 font-medium">
           실험 중 음성 또는 텍스트로 로그를 남기거나 질문할 수 있습니다. <br />
-          {/* 음성 입력 필요 시 "랩가드야"라고 부른 후 내용을 말해주세요. <br /> */}
           남긴 실험 로그를 바탕으로 리포트가 자동 생성됩니다.
         </p>
 
@@ -658,12 +656,12 @@ function ExperimentChat() {
             transition={{ duration: 0.3 }}
             className={`w-full flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <div className={`max-w-[70%] p-3 rounded-lg ${
+            <div className={`max-w-[70%] p-3 rounded-[20px] ${
               msg.sender === 'user' 
-                ? 'bg-[#E6E6FA] text-black' 
+                ? 'bg-[#E6E6FA] text-black mr-[6px] mt-[10px]' 
                 : msg.isSystemMessage 
                   ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 text-gray-800 shadow-md'
-                  : 'bg-[#F2F2F2] text-black'
+                  : 'bg-[#F2F2F2] text-black ml-[6px] mt-[10px]'
             }`}>
               <p className="whitespace-pre-wrap font-medium">{msg.text}</p>
             </div>
@@ -676,7 +674,7 @@ function ExperimentChat() {
             animate={{ opacity: 1 }}
             className="w-full flex justify-start"
           >
-            <div className="bg-[#F2F2F2] text-black max-w-[70%] p-3 rounded-lg">
+            <div className="bg-[#F2F2F2] text-black max-w-[70%] p-3 rounded-[20px] ml-4 mt-2">
               <p>입력 중...</p>
             </div>
           </motion.div>
@@ -691,12 +689,13 @@ function ExperimentChat() {
           onTextModeClick={connectWebSocket}
           onVoiceModeClick={() => {
             connectWebSocket();
-            setStatusText('음성 모드 활성화됨 - 마이크 버튼을 눌러 녹음하세요');
+            setStatusText('음성 녹음을 시작합니다...');
+            // 바로 녹음 시작
+            setTimeout(() => {
+              handleMicClick();
+            }, 100);
           }}
         />
-
-        {/* 상태 표시 */}
-        {/* <StatusBar statusText={statusText} /> */}
 
         {/* 텍스트 입력 섹션 */}
         {mode === 'text' && (
@@ -709,12 +708,19 @@ function ExperimentChat() {
 
         {/* 음성 입력 섹션 */}
         {mode === 'voice' && (
-          <VoiceControls
-            isRecording={isRecording}
-            onMicClick={handleMicClick}
-            onStopRecording={handleStopRecording}
-            statusText={statusText}
-          />
+          <div className="mt-4 text-center">
+            <div className="bg-gray-100 rounded-lg p-4 mb-4">
+              <p className="text-gray-700 font-medium">{statusText}</p>
+            </div>
+            {isRecording && (
+              <button
+                onClick={handleStopRecording}
+                className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition"
+              >
+                🛑 녹음 중지
+              </button>
+            )}
+          </div>
         )}
 
         {/* 오디오 플레이어 */}
