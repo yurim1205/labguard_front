@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import ExperimentStartBtn from '../button/experimentStartBtn';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuthStore } from '../../store/useAuthStore';
-import close from '../../assets/img/close.png';
 
 const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
   const [experiment_title, setExperimentTitle] = useState(''); // 실험 제목 상태
@@ -12,6 +11,11 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
   const [loading, setLoading] = useState(false);
   const currentUser = useAuthStore((state) => state.user);
   const currentUserId = currentUser?.id || currentUser?.user_id || null;
+  
+  // 디버깅: 사용자 정보 확인
+  console.log('NewExperimentModal - currentUser:', currentUser);
+  console.log('NewExperimentModal - currentUserId:', currentUserId);
+
   const navigate = useNavigate();
 
   // 매뉴얼 목록 가져오기
@@ -19,6 +23,8 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
     const fetchManuals = async () => {
       setLoading(true);
       try {
+        console.log('📋 실험 모달 - 매뉴얼 목록 조회 시작');
+        
         const response = await fetch('/api/manuals/', {
           method: 'GET',
           credentials: 'include',
@@ -29,8 +35,10 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
 
         if (response.ok) {
           const data = await response.json();
+          console.log('📋 실험 모달 - 매뉴얼 목록:', data);
           setManuals(data.manuals || data || []);
         } else if (response.status === 401) {
+          console.error('📋 실험 모달 - 인증 실패');
           alert('로그인이 필요합니다.');
           navigate('/login');
         } else {
@@ -141,6 +149,7 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
       } catch (briefingError) {
         console.error('🎯 브리핑 생성 에러:', briefingError);
       }
+  
 
 
       //////////////////////브리핑 끝//////////////////////
@@ -172,89 +181,61 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
   };
   
   return (
-    <div
-    className="fixed inset-0 z-[99999] bg-[#C4C2C2] bg-opacity-5 backdrop-blur-sm"
-    style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      backgroundColor: 'rgba(0, 0, 0, 0.05)', // 5% 투명도
-      backdropFilter: 'blur(4px)', // blur 적용
-      zIndex: 99999
-    }}
-  >
-  
+    <div className="fixed inset-0 z-50">
+      {/* 배경 */}
+      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
       {/* 모달 */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="bg-[#FFFFFF] rounded-[24px] p-10 shadow-lg border border-[#E6EEFF]"
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '420px',
-          height: '420px',
-          maxWidth: '90vw',
-          maxHeight: '90vh'
-        }}
-      >
+      <div className="fixed left-1/2 top-1/2 z-60 -translate-x-1/2 -translate-y-1/2 bg-[#FFFFFF] h-[420px] w-[420px] rounded-[24px] p-10 shadow-lg border border-[#E6EEFF]">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-[24px] h-[24px] mt-[9px] ml-[12px]
-          flex items-center justify-center border-none bg-transparent focus:outline-none hover:bg-[#E6EEFF]
-          cursor-pointer"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl"
         >
-          <img src={close} alt="close" className="w-[16px] h-[16px]" />
+          &times;
         </button>
-        
-        <h2 className="text-[20px] font-extrabold text-center mb-0 font-[500]">
-          새 실험 생성
-        </h2>
+        <h2 className="text-[20px] font-extrabold text-center mb-0 font-[500]">새 실험 생성</h2>
         <p className="text-[14px] text-[#5F6E9C] text-center mb-8">
           실험을 시작하기 전에 환경을 세팅해주세요.
         </p>
-
+       
         <div className="mb-10 flex flex-col items-center justify-center">
-          {/* 실험 제목 */}
-          <div className="mb-6 w-[280px] max-w-md mt-[20px]">
-            <label className="block text-[16px] font-bold text-[#1C1C59] mb-2 text-center">
-              실험 제목
-            </label>
-            <input
-              type="text"
-              placeholder="실험 제목을 입력해주세요."
-              value={experiment_title}
-              onChange={(e) => setExperimentTitle(e.target.value)}
-              className="w-full border border-gray-400 rounded px-4 py-2 text-sm h-[28px]"
-            />
-          </div>
+        {/* 실험 제목 */}
+        <div className="mb-6 w-[280px] max-w-md mt-[20px]">
+          <label className="block text-[16px] font-bold text-[#1C1C59] mb-2 text-center">실험 제목</label>
+          <input
+            type="text"
+            placeholder="실험 제목을 입력해주세요."
+            value={experiment_title}
+            onChange={(e) => setExperimentTitle(e.target.value)}
+            className="w-full border border-gray-400 rounded px-4 py-2 text-sm h-[28px]"
+          />
+        </div>
 
-          {/* 실험 매뉴얼 */}
-          <div className="mb-6 w-[280px] max-w-md mt-[32px]">
-            <label className="block text-[16px] font-bold text-[#1C1C59] mb-2 text-center">
-              실험 매뉴얼
-            </label>
-            <select
-              className="w-full border border-gray-400 rounded px-4 py-2 text-sm appearance-none h-[28px]"
-              value={selectedManual}
-              onChange={(e) => setSelectedManual(e.target.value)}
-              disabled={loading}
-            >
-              <option value="">
-                {loading ? "매뉴얼 로딩 중..." : "실험 매뉴얼 선택"}
+        {/* 실험 매뉴얼 */}
+        <div className="mb-6 w-[280px] max-w-md mt-[32px]">
+          <label className="block text-[16px] font-bold text-[#1C1C59] mb-2 text-center">실험 매뉴얼</label>
+          <select
+            className="w-full border border-gray-400 rounded px-4 py-2 text-sm appearance-none h-[28px]"
+            value={selectedManual}
+            onChange={(e) => setSelectedManual(e.target.value)}
+            disabled={loading}
+          >
+            <option value="">
+              {loading ? '매뉴얼 로딩 중...' : '실험 매뉴얼 선택'}
+            </option>
+            {manuals.map((manual, idx) => (
+              <option key={manual.manual_id || idx} value={manual.manual_id}>
+                {manual.filename || manual.title || `매뉴얼 ${idx + 1}`}
               </option>
-              {manuals.map((manual, idx) => (
-                <option key={manual.manual_id || idx} value={manual.manual_id}>
-                  {manual.filename || manual.title || `매뉴얼 ${idx + 1}`}
-                </option>
-              ))}
-            </select>
-          </div>
+            ))}
+          </select>
+          {manuals.length === 0 && !loading && (
+            <p className="text-sm text-gray-500 mt-1 text-center">
+              등록된 매뉴얼이 없습니다.
+            </p>
+          )}
+        </div>
 
-          <ExperimentStartBtn onClick={handleSubmit} />
+       <ExperimentStartBtn onClick={handleSubmit} />
         </div>
       </div>
     </div>
