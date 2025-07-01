@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import Dashboard from './pages/Dashboard';
 import ManualUpload from './pages/Manual/ManualUpload';
 import AnalyzeDone from './pages/Manual/AnalyzeDone';
@@ -13,8 +14,16 @@ import ExperimentContinue from './pages/Experiment/ExperimentContinue';
 import ReportMain from './pages/Report/ReportMain';
 import ReportRead from './pages/Report/ReportRead';
 import AuthLoader from "./components/AuthLoader";
+import { useAuthStore } from './store/useAuthStore';
 
 function App() {
+  const checkAuthStatus = useAuthStore(state => state.checkAuthStatus);
+  
+  useEffect(() => {
+    // 앱 시작 시 로그인 상태 확인
+    checkAuthStatus();
+  }, [checkAuthStatus]);
+
   return (
     <Router>
       <AuthLoader />
