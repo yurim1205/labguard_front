@@ -174,10 +174,20 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
   
   return (
     <div
-      className="fixed inset-0 z-[99999] bg-black bg-opacity-30"
-      style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
-      onClick={onClose}
-    >
+    className="fixed inset-0 z-[99999] bg-[#C4C2C2] bg-opacity-5 backdrop-blur-sm"
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      backgroundColor: 'rgba(0, 0, 0, 0.05)', // 5% 투명도
+      backdropFilter: 'blur(4px)', // blur 적용
+      zIndex: 99999
+    }}
+    onClick={onClose}
+  >
+  
       {/* 모달 */}
       <div
         onClick={(e) => e.stopPropagation()}
