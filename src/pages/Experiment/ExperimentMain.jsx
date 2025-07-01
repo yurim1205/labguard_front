@@ -136,7 +136,7 @@ function ExperimentMain() {
               <NewExperiment onClick={() => setIsModalOpen(true)} />
             </div>
             <div className="w-[360px]">
-              <ExperimentContinueCard />
+              <ExperimentContinueCard onClick={() => navigate('/ExperimentContinue')} />
             </div>
           </div>
         </section>

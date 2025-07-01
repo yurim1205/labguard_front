@@ -4,12 +4,13 @@ import ExperimentSaveBtn from './button/experimentSaveBtn';
 
 const InputModeToggle = ({ mode, onModeChange, onTextModeClick, onVoiceModeClick, onExperimentEndClick, onExperimentSaveClick }) => (
   <div className="flex gap-4 justify-between items-center mt-[20px]">
-    <div className="flex gap-4">
+    <div className="flex gap-[10px]">
       <button
-        className={`px-4 py-2 rounded-lg font-semibold border transition mr-[10px]
+        className={`px-4 py-2 w-[120px] h-[40px] rounded-[5px] font-medium text-[16px]
+          shadow-[0_12px_24px_0_rgba(128,128,128,0.35)] transition border-none gap-[10px]
           ${mode === 'voice' 
-            ? 'bg-blue-600 text-white border-blue-600' 
-            : 'bg-white text-blue-600 border-blue-600 hover:bg-blue-50'}`}
+            ? 'bg-[#565991] text-[#ffffff] hover:bg-[#4071c7]' 
+            : 'bg-[#ffffff] text-[#565991] hover:bg-[#f0f0f0]'}`}
         onClick={() => {
           onModeChange('voice');
           if (onVoiceModeClick) {
@@ -17,13 +18,14 @@ const InputModeToggle = ({ mode, onModeChange, onTextModeClick, onVoiceModeClick
           }
         }}
       >
-        🎤 음성
+        🎤 음성 질문
       </button>
       <button
-        className={`px-4 py-2 rounded-lg font-semibold border transition 
+        className={`px-4 py-2 w-[120px] h-[40px] rounded-[5px] font-medium text-[16px]
+          shadow-[0_12px_24px_0_rgba(128,128,128,0.35)] transition border-none 
           ${mode === 'text' 
-            ? 'bg-blue-600 text-white border-blue-600' 
-            : 'bg-white text-blue-600 border-blue-600 hover:bg-blue-50'}`}
+            ? 'bg-[#565991] text-[#ffffff] hover:bg-[#4071c7]' 
+            : 'bg-[#ffffff] text-[#565991] hover:bg-[#f0f0f0]'}`}
         onClick={() => {
           onModeChange('text');
           if (onTextModeClick) {
@@ -31,11 +33,13 @@ const InputModeToggle = ({ mode, onModeChange, onTextModeClick, onVoiceModeClick
           }
         }}
       >
-        💬 텍스트
+        💬 채팅하기
       </button>
     </div>
-    <ExperimentSaveBtn onClick={onExperimentSaveClick} />
-    <ExperimentEndBtn onClick={onExperimentEndClick} />
+    <div className="flex gap-[10px]">
+      <ExperimentSaveBtn onClick={onExperimentSaveClick} />
+      <ExperimentEndBtn onClick={onExperimentEndClick} />
+    </div>
   </div>
 );
 
