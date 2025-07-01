@@ -185,7 +185,6 @@ const NewExperimentModal = ({ onClose, onTitleSubmit }) => {
       backdropFilter: 'blur(4px)', // blur 적용
       zIndex: 99999
     }}
-    onClick={onClose}
   >
   
       {/* 모달 */}
