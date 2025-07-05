@@ -2,26 +2,30 @@ import React from 'react';
 
 const VoiceControls = ({ isRecording, onMicClick, onStopRecording, statusText }) => (
   <div className="flex flex-col items-center gap-3 mt-4">
-    <div className="flex gap-4 items-center">
+    <div className="flex flex-row gap-4 items-center justify-center">
       <button
         onClick={onMicClick}
         disabled={isRecording}
-        className={`text-3xl p-4 rounded-full transition-colors duration-300 
-          ${isRecording ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-black hover:bg-gray-300'}`}
+        className={`px-4 py-2 w-[120px] h-[40px] rounded-[5px] font-medium text-[16px]
+          shadow-[0_12px_24px_0_rgba(128,128,128,0.35)] transition border-none flex-shrink-0
+          ${isRecording ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#565991] hover:bg-[#4071c7] text-[#ffffff]'}`}
       >
-        🎤
+        🎤 녹음
       </button>
       
-      {isRecording && (
-        <button
-          onClick={onStopRecording}
-          className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 animate-pulse"
-        >
-          녹음 중지
-        </button>
-      )}
+      <button
+        onClick={onStopRecording}
+        disabled={!isRecording}
+        className={`px-4 py-2 w-[120px] h-[40px] rounded-[5px] font-medium text-[16px]
+          shadow-[0_12px_24px_0_rgba(128,128,128,0.35)] transition border-none flex-shrink-0
+          ${isRecording 
+            ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' 
+            : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+      >
+        🛑 중지
+      </button>
     </div>
-    <div className="text-sm text-gray-600">{statusText}</div>
+    {statusText && <div className="text-sm text-gray-600">{statusText}</div>}
   </div>
 );
 
