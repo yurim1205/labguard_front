@@ -310,12 +310,14 @@ function ManualUpload() {
 
           {/* 업로드된 매뉴얼이 없는 경우 */}
           {!manualsLoading && !manualsError && uploadedManuals.length === 0 && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-              <p className="text-gray-600 text-lg">아직 업로드된 매뉴얼이 없습니다.</p>
-              <p className="text-gray-500 text-sm mt-2">PDF 파일을 업로드하여 매뉴얼을 등록해보세요.</p>
+            <div className="bg-gray-50 border border-[#0E467B] rounded-[10px] p-8 text-center">
+              <p className="text-[#0E467B] text-lg">아직 업로드된 매뉴얼이 없습니다.</p>
+              <p className="text-[#0E467B] text-sm mt-2">PDF 파일을 업로드하여 매뉴얼을 등록해보세요.</p>
               <button 
                 onClick={fetchManuals}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className={`px-4 py-2 w-[120px] h-[40px] rounded-[5px] font-medium text-[14px] mb-[10px]
+                  shadow-[0_12px_24px_0_rgba(128,128,128,0.35)] transition border-none flex-shrink-0
+                  bg-[#99B5CE] hover:bg-[#4071c7] text-[#ffffff]`}
               >
                 목록 새로고침
               </button>

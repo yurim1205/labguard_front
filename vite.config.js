@@ -10,6 +10,7 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
+        ws: true,
       },
       '/ws': {
         target: 'http://localhost:8000', // HTTP로 설정 (Vite가 자동으로 WebSocket으로 업그레이드)

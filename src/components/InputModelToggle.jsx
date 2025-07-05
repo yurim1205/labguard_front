@@ -7,10 +7,10 @@ const InputModeToggle = ({ mode, onModeChange, onTextModeClick, onVoiceModeClick
     <div className="flex gap-[10px]">
       <button
         className={`px-4 py-2 w-[120px] h-[40px] rounded-[5px] font-medium text-[16px]
-          shadow-[0_12px_24px_0_rgba(128,128,128,0.35)] transition border-none gap-[10px]
+          shadow-[0_12px_24px_0_rgba(128,128,128,0.35)] transition border-none
           ${mode === 'voice' 
-            ? 'bg-[#565991] text-[#ffffff] hover:bg-[#4071c7]' 
-            : 'bg-[#ffffff] text-[#565991] hover:bg-[#f0f0f0]'}`}
+            ? 'bg-[#99B5CE] text-[#ffffff] hover:bg-[#4071c7]' 
+            : 'bg-[#99B5CE] text-[#ffffff] hover:bg-[#4071c7]'}`}
         onClick={() => {
           onModeChange('voice');
           if (onVoiceModeClick) {
@@ -23,9 +23,9 @@ const InputModeToggle = ({ mode, onModeChange, onTextModeClick, onVoiceModeClick
       <button
         className={`px-4 py-2 w-[120px] h-[40px] rounded-[5px] font-medium text-[16px]
           shadow-[0_12px_24px_0_rgba(128,128,128,0.35)] transition border-none 
-          ${mode === 'text' 
-            ? 'bg-[#565991] text-[#ffffff] hover:bg-[#4071c7]' 
-            : 'bg-[#ffffff] text-[#565991] hover:bg-[#f0f0f0]'}`}
+          ${mode === 'voice' 
+            ? 'bg-[#99B5CE] text-[#ffffff] hover:bg-[#4071c7]' 
+            : 'bg-[#99B5CE] text-[#ffffff] hover:bg-[#4071c7]'}`}
         onClick={() => {
           onModeChange('text');
           if (onTextModeClick) {
